@@ -1061,50 +1061,64 @@
         function confirmCheckout() {
             closeCheckoutConfirm();
             
-            // --- ФОРМИРУЕМ СООБЩЕНИЕ С НИКОМ И ССЫЛКОЙ ---
             var userData = tg.initDataUnsafe.user;
+            var userId = userData ? userData.id : null;
             var firstName = userData ? userData.first_name : "Неизвестно";
-            var userId = userData ? userData.id : "Неизвестно";
             var username = userData && userData.username ? "@" + userData.username : "Нет ника";
             
-            // Ссылка на профиль
+            if (!userId) {
+                alert("Ошибка: не удалось определить пользователя.");
+                return;
+            }
+            
             var profileLink = '<a href="tg://user?id=' + userId + '">' + firstName + '</a>';
+            
+            var orderListText = "";
+            cart.forEach(function(item, index) {
+                orderListText += (index + 1) + ". " + item.service + " — " + item.amount + "\n";
+            });
             
             var orderText = "⚠️ <b>Новый заказ!</b> (из Mini App)\n\n";
             orderText += "👤 Клиент: " + profileLink + " (" + username + ")\n";
             orderText += "🆔 ID: <code>" + userId + "</code>\n\n";
-            orderText += "📦 <b>Состав заказа:</b>\n";
+            orderText += "📦 <b>Состав заказа:</b>\n" + orderListText;
             
-            cart.forEach(function(item, index) {
-                orderText += (index + 1) + ". " + item.service + " — " + item.amount + "\n";
-            });
-            
-            // Твой токен и ID группы
             var BOT_TOKEN = "8955036904:AAEKXISSYihl1EItpTaxQjAmEzUEfL5QD1c";
             var GROUP_ID = "-1004358524484";
             
-            var url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage";
-            
-            fetch(url, {
+            // 1. Отправляем в группу
+            fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    chat_id: GROUP_ID,
-                    text: orderText,
-                    parse_mode: "HTML"
-                })
+                body: JSON.stringify({ chat_id: GROUP_ID, text: orderText, parse_mode: "HTML" })
             })
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.ok) {
-                    var modal = document.getElementById('successModal');
-                    if (modal) modal.classList.add('active');
+                    var groupMsgId = data.result.message_id;
                     
-                    cart = [];
-                    updateCartUI();
-                    saveCart();
+                    // 2. Отправляем боту в личку скрытую команду
+                    var itemsStr = cart.map(function(item) { return item.service + "|" + item.amount; }).join("|");
+                    var botHiddenMsg = "WEB_ORDER|" + groupMsgId + "|" + itemsStr;
                     
-                    if (tg) tg.HapticFeedback.notificationOccurred('success');
+                    fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 
+                            chat_id: userId, 
+                            text: botHiddenMsg,
+                            disable_notification: true 
+                        })
+                    }).then(function() {
+                        var modal = document.getElementById('successModal');
+                        if (modal) modal.classList.add('active');
+                        
+                        cart = [];
+                        updateCartUI();
+                        saveCart();
+                        
+                        if (tg) tg.HapticFeedback.notificationOccurred('success');
+                    });
                 } else {
                     alert("Ошибка при отправке заказа. Попробуйте позже.");
                 }
