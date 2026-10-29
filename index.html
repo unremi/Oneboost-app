@@ -709,16 +709,16 @@
         <div class="map-title-fullscreen">Выберите карту</div>
         <div class="map-close-btn" onclick="closeFullScreenMap()">✕</div>
 
-        <div class="map-point" style="top: 75%; left: 25%;" onclick="openMapPoint('Ферма', 'Запретная зона', 650)">
+        <div class="map-point" style="top: 75%; left: 25%;" onclick="openMapPoint('Ферма', 'Запретная зона', 350)">
             <div class="map-point-label">Ферма</div>
         </div>
-        <div class="map-point" style="top: 25%; left: 65%;" onclick="openMapPoint('Нортридж', 'Зона блокады', 650)">
+        <div class="map-point" style="top: 25%; left: 65%;" onclick="openMapPoint('Нортридж', 'Зона блокады', 350)">
             <div class="map-point-label">Нортридж</div>
         </div>
-        <div class="map-point" style="top: 55%; left: 45%;" onclick="openMapPoint('Арсенал', 'Запретная зона', 650)">
+        <div class="map-point" style="top: 55%; left: 45%;" onclick="openMapPoint('Арсенал', 'Запретная зона', 350)">
             <div class="map-point-label">Арсенал</div>
         </div>
-        <div class="map-point" style="top: 40%; left: 80%;" onclick="openMapPoint('Телецентр', 'Запретная зона', 650)">
+        <div class="map-point" style="top: 40%; left: 80%;" onclick="openMapPoint('Телецентр', 'Запретная зона', 350)">
             <div class="map-point-label">Телецентр</div>
         </div>
     </div>
@@ -728,7 +728,8 @@
         <div class="modal-content">
             <svg class="modal-icon" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
             <div class="modal-title" id="mapModalTitle">Название карты</div>
-            <div style="font-size: 15px; color: #c7a4ff; font-weight: 700; margin-bottom: 20px;" id="mapModalPrice">650 ₽</div>
+            <div style="font-size: 15px; color: #c7a4ff; font-weight: 700; margin-bottom: 5px;" id="mapModalPrice">350 ₽</div>
+            <div style="font-size: 12px; color: #b0a3c9; margin-bottom: 20px;">Гарантированный вынос от 1.5 млн коинов</div>
             <div class="modal-actions">
                 <button class="modal-btn btn-cancel" onclick="closeMapModal()">Отмена</button>
                 <button class="modal-btn btn-confirm" onclick="confirmMapPoint()">Добавить</button>
@@ -1086,7 +1087,6 @@
             var BOT_TOKEN = "8955036904:AAEKXISSYihl1EItpTaxQjAmEzUEfL5QD1c";
             var GROUP_ID = "-1004358524484";
             
-            // 1. Отправляем в группу
             fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -1096,8 +1096,6 @@
             .then(function(data) {
                 if (data.ok) {
                     var groupMsgId = data.result.message_id;
-                    
-                    // 2. Отправляем боту в личку скрытую команду
                     var itemsStr = cart.map(function(item) { return item.service + "|" + item.amount; }).join("|");
                     var botHiddenMsg = "WEB_ORDER|" + groupMsgId + "|" + itemsStr;
                     
