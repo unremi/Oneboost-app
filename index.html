@@ -81,16 +81,14 @@
         .btn-go-catalog:active { transform: scale(0.97); }
 
         /* --- СЛАЙДЕР --- */
-        .section-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; color: #e0d4ff; }
+        .section-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; color: #e0d4ff; text-align: left; }
         
-        /* Обновленный слайдер: на всю ширину без отступов */
         .slider-wrapper { 
             position: relative; 
-            margin-left: -20px; 
-            margin-right: -20px; 
-            width: calc(100% + 40px); 
+            width: 100%; 
             overflow: hidden; 
             margin-bottom: 10px;
+            border-radius: 20px;
         }
         .slider-container { 
             display: flex; 
@@ -99,17 +97,17 @@
             -webkit-overflow-scrolling: touch; 
             scrollbar-width: none; 
             height: 175px; 
-            padding: 0 20px; 
             gap: 15px;
+            padding: 0;
         }
         .slider-container::-webkit-scrollbar { display: none; }
         
         .slide-card {
-            min-width: calc(100vw - 40px); /* Карточка на весь экран минус отступы */
+            min-width: 100%; 
             background: linear-gradient(135deg, rgba(70, 25, 120, 0.7) 0%, rgba(25, 10, 50, 0.9) 100%);
             border: 1px solid rgba(199, 164, 255, 0.25); border-radius: 20px; padding: 20px;
             display: flex; flex-direction: column; justify-content: space-between; position: relative;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.5); scroll-snap-align: start; box-sizing: border-box;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5); scroll-snap-align: center; box-sizing: border-box;
             overflow: hidden;
         }
         .slide-watermark { position: absolute; top: -10px; right: -10px; width: 100px; height: 100px; stroke: rgba(199, 164, 255, 0.12); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(15deg); }
@@ -796,11 +794,7 @@
             
             var user = tg.initDataUnsafe.user;
             if (user) {
-                var nameEl = document.getElementById('tg-name');
-                var idEl = document.getElementById('tg-id');
                 var titleEl = document.querySelector('.welcome-title');
-                if (nameEl) nameEl.innerText = user.first_name;
-                if (idEl) idEl.innerText = 'ID: ' + user.id;
                 if (titleEl) titleEl.innerHTML = 'Приветствуем, <br><span>' + user.first_name + '!</span>';
             }
 
@@ -1053,10 +1047,20 @@
         function confirmCheckout() {
             closeCheckoutConfirm();
             
-            var orderText = "⚠️ Новый заказ (из Mini App)!\n\n";
-            orderText += "Клиент: " + (tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Неизвестно") + "\n";
-            orderText += "ID: " + (tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "Неизвестно") + "\n\n";
-            orderText += "Состав заказа:\n";
+            // --- ФОРМИРУЕМ СООБЩЕНИЕ С НИКОМ И ССЫЛКОЙ ---
+            var userData = tg.initDataUnsafe.user;
+            var firstName = userData ? userData.first_name : "Неизвестно";
+            var userId = userData ? userData.id : "Неизвестно";
+            var username = userData && userData.username ? "@" + userData.username : "Нет ника";
+            
+            // Ссылка на профиль
+            var profileLink = '<a href="tg://user?id=' + userId + '">' + firstName + '</a>';
+            
+            var orderText = "⚠️ <b>Новый заказ!</b> (из Mini App)\n\n";
+            orderText += "👤 Клиент: " + profileLink + " (" + username + ")\n";
+            orderText += "🆔 ID: <code>" + userId + "</code>\n\n";
+            orderText += "📦 <b>Состав заказа:</b>\n";
+            
             cart.forEach(function(item, index) {
                 orderText += (index + 1) + ". " + item.service + " — " + item.amount + "\n";
             });
