@@ -658,24 +658,17 @@
 
     <!-- ВКЛАДКА: ЗАКАЗЫ -->
     <div id="tab-orders" class="tab-content">
-        <h2 class="section-title">Мои заказы</h2>
-        
-        <div class="cart-empty" style="padding: 40px 20px;">
+        <h2 class="section-title">Мои заказы (из приложения)</h2>
+        <div id="orders-list-container"></div>
+        <div id="orders-empty" class="cart-empty" style="display: none;">
             <svg class="svg-icon-large" viewBox="0 0 24 24" style="width: 50px; height: 50px; margin-bottom: 20px; stroke: #c7a4ff;">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
                 <line x1="16" y1="13" x2="8" y2="13"></line>
                 <line x1="16" y1="17" x2="8" y2="17"></line>
             </svg>
-            <p style="font-size: 15px; line-height: 1.5; color: #eae4f5; margin-bottom: 15px;">
-                Управление заказами доступно в нашем боте!
-            </p>
-            <p style="font-size: 13px; line-height: 1.5; color: #b0a3c9; margin-bottom: 25px;">
-                Там вы можете посмотреть состав заказа, актуальный статус или отменить его.
-            </p>
-            <button onclick="openBotOrders()" style="background: linear-gradient(135deg, #9d4edd 0%, #5a189a 100%); color: #fff; border: none; padding: 14px 20px; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);">
-                Перейти в бота
-            </button>
+            <p style="font-size: 15px; color: #eae4f5;">У вас пока нет заказов из приложения</p>
+            <p style="font-size: 13px; color: #b0a3c9; margin-top: 10px;">Заказы, сделанные через кнопки в боте, смотрите в разделе «Мои заказы» в самом боте.</p>
         </div>
     </div>
 
@@ -845,6 +838,7 @@
 
             if (tabName === 'home') hideInfo();
             if (tabName === 'catalog') closePrice();
+            if (tabName === 'orders') renderOrders(); // Рендерим заказы при переходе
 
             if (tg && tg.BackButton) {
                 if (tabName === 'home') {
@@ -1087,7 +1081,6 @@
             var BOT_TOKEN = "8955036904:AAEpJcHRPoAV9QxAVMMJGiGGnzjmvZepT20";
             var GROUP_ID = "-1004358524484";
             
-            // Отправляем ТОЛЬКО в группу, без скрытых сообщений в личку
             fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -1096,6 +1089,19 @@
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.ok) {
+                    var groupMsgId = data.result.message_id;
+                    
+                    // СОХРАНЯЕМ В ПАМЯТЬ ТЕЛЕФОНА
+                    var savedOrders = JSON.parse(localStorage.getItem('my_orders_list') || '[]');
+                    var newOrderObj = {
+                        id: groupMsgId,
+                        number: savedOrders.length + 1,
+                        items: cart.map(function(i) { return i.service + " (" + i.amount + ")"; }).join(", "),
+                        status: "active"
+                    };
+                    savedOrders.push(newOrderObj);
+                    localStorage.setItem('my_orders_list', JSON.stringify(savedOrders));
+                    
                     var modal = document.getElementById('successModal');
                     if (modal) modal.classList.add('active');
                     
@@ -1119,16 +1125,116 @@
             switchTab('home', document.getElementById('nav-home')); 
         }
 
-        // --- ПЕРЕХОД В БОТА ЗА ЗАКАЗАМИ ---
-        function openBotOrders() {
-            var botUrl = "https://t.me/KTNBOOST_bot?start=my_orders";
-            
-            if (tg) {
-                tg.openTelegramLink(botUrl);
-                tg.close();
+        // --- ЛОГИКА ЗАКАЗОВ ТОЛЬКО В MINI APP ---
+        function renderOrders() {
+            var container = document.getElementById('orders-list-container');
+            var emptyState = document.getElementById('orders-empty');
+            if (!container) return;
+
+            var savedOrders = JSON.parse(localStorage.getItem('my_orders_list') || '[]');
+            container.innerHTML = '';
+
+            if (savedOrders.length === 0) {
+                if (emptyState) emptyState.style.display = 'flex';
             } else {
-                window.open(botUrl, "_blank");
+                if (emptyState) emptyState.style.display = 'none';
+                
+                savedOrders.forEach(function(order) {
+                    var div = document.createElement('div');
+                    div.className = 'cart-item';
+                    div.style.flexDirection = 'column';
+                    div.style.alignItems = 'flex-start';
+                    div.style.gap = '10px';
+                    
+                    var statusText = order.status === 'active' ? 'В обработке' : 'Выполнен';
+                    var statusColor = order.status === 'active' ? '#c7a4ff' : '#00ff64';
+                    
+                    div.innerHTML = `
+                        <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                            <h4 style="color:#fff;">Заказ #${order.number}</h4>
+                            <span style="color: ${statusColor}; font-size:12px;">${statusText}</span>
+                        </div>
+                        <p style="color: #b0a3c9; font-size:13px;">${order.items}</p>
+                        ${order.status === 'active' ? `
+                        <div style="display:flex; gap:10px; width:100%; margin-top:5px;">
+                            <button onclick="openCompleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(0, 255, 100, 0.1); border:1px solid rgba(0, 255, 100, 0.3); color:#00ff64; padding:8px; border-radius:8px; cursor:pointer;">Завершить</button>
+                            <button onclick="openDeleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(255, 0, 85, 0.1); border:1px solid rgba(255, 0, 85, 0.3); color:#ff0055; padding:8px; border-radius:8px; cursor:pointer;">Удалить</button>
+                        </div>
+                        ` : ''}
+                    `;
+                    container.appendChild(div);
+                });
             }
+        }
+
+        var currentAction = null;
+
+        function openCompleteModal(id, num) {
+            currentAction = { type: 'complete', id: id, num: num };
+            document.getElementById('checkoutConfirmTitle').innerText = 'Подтвердить выполнение заказа #' + num + '?';
+            document.getElementById('checkoutConfirmModal').classList.add('active');
+            
+            var btn = document.querySelector('#checkoutConfirmModal .btn-confirm');
+            btn.innerText = 'Да, завершить';
+            btn.onclick = executeAction;
+        }
+
+        function openDeleteModal(id, num) {
+            currentAction = { type: 'delete', id: id, num: num };
+            document.getElementById('checkoutConfirmTitle').innerText = 'Удалить заказ #' + num + '?';
+            document.getElementById('checkoutConfirmModal').classList.add('active');
+            
+            var btn = document.querySelector('#checkoutConfirmModal .btn-confirm');
+            btn.innerText = 'Да, удалить';
+            btn.onclick = executeAction;
+        }
+
+        function executeAction() {
+            if (!currentAction) return;
+            
+            var BOT_TOKEN = "8955036904:AAFIz21qFIgpj96xIP-IQceryP3Zw26bWWw";
+            var GROUP_ID = "-1004358524484";
+            var url = "https://api.telegram.org/bot" + BOT_TOKEN;
+            var savedOrders = JSON.parse(localStorage.getItem('my_orders_list') || '[]');
+            
+            if (currentAction.type === 'complete') {
+                // Меняем сообщение в группе на "Выполнен"
+                fetch(url + "/editMessageText", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: GROUP_ID,
+                        message_id: currentAction.id,
+                        text: `✅ <b>Заказ #${currentAction.num} выполнен!</b>`,
+                        parse_mode: "HTML"
+                    })
+                });
+                
+                // Меняем статус в памяти
+                savedOrders.forEach(function(o) {
+                    if (o.id === currentAction.id) o.status = 'completed';
+                });
+                
+            } else if (currentAction.type === 'delete') {
+                // Удаляем сообщение из группы
+                fetch(url + "/deleteMessage", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: GROUP_ID,
+                        message_id: currentAction.id
+                    })
+                });
+                
+                // Удаляем из памяти
+                savedOrders = savedOrders.filter(function(o) { return o.id !== currentAction.id; });
+            }
+            
+            localStorage.setItem('my_orders_list', JSON.stringify(savedOrders));
+            renderOrders();
+            
+            document.getElementById('checkoutConfirmModal').classList.remove('active');
+            currentAction = null;
         }
 
         // --- ЛОГИКА СЛАЙДЕРА ---
