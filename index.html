@@ -659,9 +659,23 @@
     <!-- ВКЛАДКА: ЗАКАЗЫ -->
     <div id="tab-orders" class="tab-content">
         <h2 class="section-title">Мои заказы</h2>
-        <div class="list-item" style="justify-content: center; padding: 40px; flex-direction: column;">
-            <svg class="svg-icon-large" viewBox="0 0 24 24" style="margin-bottom: 15px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-            <div style="color: #a89bce;">Список пуст</div>
+        
+        <div class="cart-empty" style="padding: 40px 20px;">
+            <svg class="svg-icon-large" viewBox="0 0 24 24" style="width: 50px; height: 50px; margin-bottom: 20px; stroke: #c7a4ff;">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <p style="font-size: 15px; line-height: 1.5; color: #eae4f5; margin-bottom: 15px;">
+                Управление заказами доступно в нашем боте!
+            </p>
+            <p style="font-size: 13px; line-height: 1.5; color: #b0a3c9; margin-bottom: 25px;">
+                Там вы можете посмотреть состав заказа, актуальный статус или отменить его.
+            </p>
+            <button onclick="openBotOrders()" style="background: linear-gradient(135deg, #9d4edd 0%, #5a189a 100%); color: #fff; border: none; padding: 14px 20px; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);">
+                Перейти в бота
+            </button>
         </div>
     </div>
 
@@ -1104,6 +1118,18 @@
             var modal = document.getElementById('successModal');
             if (modal) modal.classList.remove('active');
             switchTab('home', document.getElementById('nav-home')); 
+        }
+
+        // --- ПЕРЕХОД В БОТА ЗА ЗАКАЗАМИ ---
+        function openBotOrders() {
+            var botUrl = "https://t.me/KTNBOOST_bot?start=my_orders";
+            
+            if (tg) {
+                tg.openTelegramLink(botUrl);
+                tg.close();
+            } else {
+                window.open(botUrl, "_blank");
+            }
         }
 
         // --- ЛОГИКА СЛАЙДЕРА ---
