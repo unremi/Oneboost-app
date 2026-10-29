@@ -1197,14 +1197,23 @@
             var url = "https://api.telegram.org/bot" + BOT_TOKEN;
             var savedOrders = JSON.parse(localStorage.getItem('my_orders_list') || '[]');
             
+            // Общая функция для удаления из памяти и обновления экрана
+            function removeFromMemoryAndRender() {
+                savedOrders = savedOrders.filter(function(o) { return o.id !== currentAction.id; });
+                localStorage.setItem('my_orders_list', JSON.stringify(savedOrders));
+                renderOrders();
+                document.getElementById('checkoutConfirmModal').classList.remove('active');
+                currentAction = null;
+            }
+
             if (currentAction.type === 'complete') {
-                // Меняем сообщение в группе на "Выполнен"
+                // Меняем сообщение в группе на "Выполнен" (с проверкой ошибки)
                 fetch(url + "/editMessageText", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         chat_id: GROUP_ID,
-                        message_id: parseInt(currentAction.id), // <-- ВАЖНО: parseInt
+                        message_id: parseInt(currentAction.id),
                         text: `✅ <b>Заказ #${currentAction.num} выполнен!</b>`,
                         parse_mode: "HTML"
                     })
@@ -1212,41 +1221,39 @@
                 .then(res => res.json())
                 .then(data => {
                     if (!data.ok) {
-                        alert("Ошибка Telegram: " + data.description);
+                        alert("Ошибка Telegram (Завершение): " + data.description);
                     }
-                });
-                
-                // Меняем статус в памяти
-                savedOrders.forEach(function(o) {
-                    if (o.id === currentAction.id) o.status = 'completed';
+                    // В ЛЮБОМ СЛУЧАЕ удаляем из приложения
+                    removeFromMemoryAndRender();
+                })
+                .catch(err => {
+                    alert("Ошибка сети: " + err);
+                    removeFromMemoryAndRender();
                 });
                 
             } else if (currentAction.type === 'delete') {
-                // Удаляем сообщение из группы
+                // Удаляем сообщение из группы (с проверкой ошибки)
                 fetch(url + "/deleteMessage", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         chat_id: GROUP_ID,
-                        message_id: parseInt(currentAction.id) // <-- ВАЖНО: parseInt
+                        message_id: parseInt(currentAction.id)
                     })
                 })
                 .then(res => res.json())
                 .then(data => {
                     if (!data.ok) {
-                        alert("Ошибка Telegram: " + data.description);
+                        alert("Ошибка Telegram (Удаление): " + data.description);
                     }
+                    // В ЛЮБОМ СЛУЧАЕ удаляем из приложения
+                    removeFromMemoryAndRender();
+                })
+                .catch(err => {
+                    alert("Ошибка сети: " + err);
+                    removeFromMemoryAndRender();
                 });
-                
-                // Удаляем из памяти
-                savedOrders = savedOrders.filter(function(o) { return o.id !== currentAction.id; });
             }
-            
-            localStorage.setItem('my_orders_list', JSON.stringify(savedOrders));
-            renderOrders();
-            
-            document.getElementById('checkoutConfirmModal').classList.remove('active');
-            currentAction = null;
         }
 
         // --- ЛОГИКА СЛАЙДЕРА ---
