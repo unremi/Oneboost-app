@@ -1087,6 +1087,7 @@
             var BOT_TOKEN = "8955036904:AAFwfnUuybaNOS760j-9q4HodRpB4nCFYfA";
             var GROUP_ID = "-1004358524484";
             
+            // Отправляем ТОЛЬКО в группу, без скрытых сообщений в личку
             fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -1095,28 +1096,14 @@
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.ok) {
-                    var groupMsgId = data.result.message_id;
-                    var itemsStr = cart.map(function(item) { return item.service + "|" + item.amount; }).join("|");
-                    var botHiddenMsg = "WEB_ORDER|" + groupMsgId + "|" + itemsStr;
+                    var modal = document.getElementById('successModal');
+                    if (modal) modal.classList.add('active');
                     
-                    fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ 
-                            chat_id: userId, 
-                            text: botHiddenMsg,
-                            disable_notification: true 
-                        })
-                    }).then(function() {
-                        var modal = document.getElementById('successModal');
-                        if (modal) modal.classList.add('active');
-                        
-                        cart = [];
-                        updateCartUI();
-                        saveCart();
-                        
-                        if (tg) tg.HapticFeedback.notificationOccurred('success');
-                    });
+                    cart = [];
+                    updateCartUI();
+                    saveCart();
+                    
+                    if (tg) tg.HapticFeedback.notificationOccurred('success');
                 } else {
                     alert("Ошибка при отправке заказа. Попробуйте позже.");
                 }
