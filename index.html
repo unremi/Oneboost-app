@@ -1042,10 +1042,17 @@
         // --- 6. ОФОРМЛЕНИЕ ---
         function openCheckoutConfirm() {
             if (cart.length === 0) return;
+            
             var title = document.getElementById('checkoutConfirmTitle');
             if (title) title.innerText = 'Вы уверены, что хотите оформить заказ на ' + cart.length + ' позиций?';
+            
             var modal = document.getElementById('checkoutConfirmModal');
             if (modal) modal.classList.add('active');
+            
+            // ВОЗВРАЩАЕМ КНОПКУ К ИСХОДНОМУ СОСТОЯНИЮ
+            var btn = document.querySelector('#checkoutConfirmModal .btn-confirm');
+            btn.innerText = 'Да, оформить';
+            btn.onclick = confirmCheckout;
         }
 
         function closeCheckoutConfirm() {
