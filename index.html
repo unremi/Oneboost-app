@@ -1204,10 +1204,16 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         chat_id: GROUP_ID,
-                        message_id: currentAction.id,
+                        message_id: parseInt(currentAction.id), // <-- ВАЖНО: parseInt
                         text: `✅ <b>Заказ #${currentAction.num} выполнен!</b>`,
                         parse_mode: "HTML"
                     })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) {
+                        alert("Ошибка Telegram: " + data.description);
+                    }
                 });
                 
                 // Меняем статус в памяти
@@ -1222,8 +1228,14 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         chat_id: GROUP_ID,
-                        message_id: currentAction.id
+                        message_id: parseInt(currentAction.id) // <-- ВАЖНО: parseInt
                     })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) {
+                        alert("Ошибка Telegram: " + data.description);
+                    }
                 });
                 
                 // Удаляем из памяти
