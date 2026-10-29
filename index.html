@@ -82,11 +82,31 @@
 
         /* --- СЛАЙДЕР --- */
         .section-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; color: #e0d4ff; }
-        .slider-wrapper { position: relative; margin-bottom: 10px; border-radius: 20px; overflow: hidden; width: 100%; }
-        .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; height: 175px; }
+        
+        /* Обновленный слайдер: на всю ширину без отступов */
+        .slider-wrapper { 
+            position: relative; 
+            margin-left: -20px; 
+            margin-right: -20px; 
+            width: calc(100% + 40px); 
+            overflow: hidden; 
+            margin-bottom: 10px;
+        }
+        .slider-container { 
+            display: flex; 
+            overflow-x: auto; 
+            scroll-snap-type: x mandatory; 
+            -webkit-overflow-scrolling: touch; 
+            scrollbar-width: none; 
+            height: 175px; 
+            padding: 0 20px; 
+            gap: 15px;
+        }
         .slider-container::-webkit-scrollbar { display: none; }
+        
         .slide-card {
-            min-width: 100%; background: linear-gradient(135deg, rgba(70, 25, 120, 0.7) 0%, rgba(25, 10, 50, 0.9) 100%);
+            min-width: calc(100vw - 40px); /* Карточка на весь экран минус отступы */
+            background: linear-gradient(135deg, rgba(70, 25, 120, 0.7) 0%, rgba(25, 10, 50, 0.9) 100%);
             border: 1px solid rgba(199, 164, 255, 0.25); border-radius: 20px; padding: 20px;
             display: flex; flex-direction: column; justify-content: space-between; position: relative;
             box-shadow: inset 0 0 40px rgba(0,0,0,0.5); scroll-snap-align: start; box-sizing: border-box;
@@ -108,7 +128,7 @@
         .slide-btn:hover { background: rgba(199, 164, 255, 0.25); }
 
         .pagination { display: flex; justify-content: center; gap: 6px; margin-bottom: 25px; margin-top: 15px; }
-        .dot { width: 18px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; transition: all 0.3s ease; }
+        .dot { width: 18px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; transition: all 0.3s ease; cursor: pointer; }
         .dot.active { background: #c7a4ff; width: 28px; box-shadow: 0 0 8px rgba(199, 164, 255, 0.5); }
 
         /* --- ЧАСТЫЕ ВОПРОСЫ --- */
@@ -495,10 +515,10 @@
             </div>
 
             <div class="pagination" id="pagination">
-                <div class="dot active"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
+                <div class="dot active" onclick="goToSlide(0)"></div>
+                <div class="dot" onclick="goToSlide(1)"></div>
+                <div class="dot" onclick="goToSlide(2)"></div>
+                <div class="dot" onclick="goToSlide(3)"></div>
             </div>
 
             <h3 class="section-title">Частые вопросы</h3>
@@ -771,8 +791,6 @@
         if (tg) {
             tg.ready();
             tg.expand();
-            
-            // Улучшение: цвета шапки и фона
             if (tg.setHeaderColor) tg.setHeaderColor('#0c0516');
             if (tg.setBackgroundColor) tg.setBackgroundColor('#0c0516');
             
@@ -786,7 +804,6 @@
                 if (titleEl) titleEl.innerHTML = 'Приветствуем, <br><span>' + user.first_name + '!</span>';
             }
 
-            // Улучшение: обработка кнопки "Назад"
             if (tg.BackButton) {
                 tg.BackButton.onClick(function() {
                     var activeTab = document.querySelector('.tab-content.active');
@@ -820,7 +837,6 @@
             if (tabName === 'home') hideInfo();
             if (tabName === 'catalog') closePrice();
 
-            // Показ/скрытие кнопки "Назад" в Телеграме
             if (tg && tg.BackButton) {
                 if (tabName === 'home') {
                     tg.BackButton.hide();
@@ -1037,28 +1053,83 @@
         function confirmCheckout() {
             closeCheckoutConfirm();
             
-            var orderString = cart.map(function(item) { return item.service + '|' + item.amount; }).join(';');
-            var fullData = 'CART|' + orderString;
-
-            if (tg && tg.sendData) {
-                tg.sendData(fullData);
-                if (tg) tg.HapticFeedback.notificationOccurred('success');
-                
-                var modal = document.getElementById('successModal');
-                if (modal) modal.classList.add('active');
-                
-                cart = [];
-                updateCartUI();
-                saveCart();
-            } else {
-                alert('Ошибка: оформление доступно только внутри Telegram.');
-            }
+            var orderText = "⚠️ Новый заказ (из Mini App)!\n\n";
+            orderText += "Клиент: " + (tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Неизвестно") + "\n";
+            orderText += "ID: " + (tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "Неизвестно") + "\n\n";
+            orderText += "Состав заказа:\n";
+            cart.forEach(function(item, index) {
+                orderText += (index + 1) + ". " + item.service + " — " + item.amount + "\n";
+            });
+            
+            // Твой токен и ID группы
+            var BOT_TOKEN = "8955036904:AAEKXISSYihl1EItpTaxQjAmEzUEfL5QD1c";
+            var GROUP_ID = "-1004358524484";
+            
+            var url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage";
+            
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: GROUP_ID,
+                    text: orderText,
+                    parse_mode: "HTML"
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.ok) {
+                    var modal = document.getElementById('successModal');
+                    if (modal) modal.classList.add('active');
+                    
+                    cart = [];
+                    updateCartUI();
+                    saveCart();
+                    
+                    if (tg) tg.HapticFeedback.notificationOccurred('success');
+                } else {
+                    alert("Ошибка при отправке заказа. Попробуйте позже.");
+                }
+            })
+            .catch(function(error) {
+                alert("Ошибка сети. Попробуйте позже.");
+            });
         }
 
         function closeSuccessModal() {
             var modal = document.getElementById('successModal');
             if (modal) modal.classList.remove('active');
             switchTab('home', document.getElementById('nav-home')); 
+        }
+
+        // --- ЛОГИКА СЛАЙДЕРА ---
+        var slider = document.getElementById('slider');
+        var dots = document.querySelectorAll('.dot');
+
+        if (slider) {
+            slider.addEventListener('scroll', function() {
+                var width = slider.offsetWidth;
+                var scrollLeft = slider.scrollLeft;
+                var index = Math.round(scrollLeft / width);
+                
+                dots.forEach(function(dot, i) {
+                    if (i === index) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        function goToSlide(index) {
+            if (slider) {
+                var width = slider.offsetWidth;
+                slider.scrollTo({
+                    left: width * index,
+                    behavior: 'smooth'
+                });
+            }
         }
 
         // --- 7. ЗАПУСК ---
