@@ -6,346 +6,289 @@
     <title>OneBoost | Arena Breakout</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;700;800&display=swap');
 
         :root {
-            --bg-dark: #05020a;
-            --bg-card: rgba(20, 10, 35, 0.6);
-            --neon-purple: #9d4edd;
-            --neon-light: #c7a4ff;
-            --text-main: #ffffff;
-            --text-muted: #a89bce;
-            --glass-border: rgba(157, 78, 221, 0.3);
-            --glass-border-hover: rgba(199, 164, 255, 0.6);
+            --bg-main: #06030a;
+            --bg-card: #140b24;
+            --bg-card-light: #23133f;
+            --neon: #8a2be2;
+            --neon-light: #b485ff;
+            --text: #ffffff;
+            --text-muted: #8c7c9e;
+            --border: rgba(138, 43, 226, 0.2);
+            --glow: 0 0 20px rgba(138, 43, 226, 0.4);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-main);
+            /* Фон с объемными фиолетовыми пятнами как на фото */
             background-image: 
-                radial-gradient(circle at 15% 50%, rgba(157, 78, 221, 0.15), transparent 30%),
-                radial-gradient(circle at 85% 30%, rgba(157, 78, 221, 0.1), transparent 30%);
+                radial-gradient(circle at 10% 10%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(20, 11, 36, 1) 0%, var(--bg-main) 100%);
             background-attachment: fixed;
-            color: var(--text-main);
+            color: var(--text);
             min-height: 100vh;
             padding: 20px;
             padding-bottom: 110px;
             overflow-x: hidden;
-            position: relative;
         }
 
-        /* --- СВЕЧЕНИЕ НА ФОНЕ --- */
-        .bg-glow-1, .bg-glow-2 {
-            position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; pointer-events: none;
-        }
-        .bg-glow-1 { width: 300px; height: 300px; background: rgba(157, 78, 221, 0.2); top: -50px; right: -50px; }
-        .bg-glow-2 { width: 250px; height: 250px; background: rgba(90, 24, 154, 0.2); bottom: 10%; left: -50px; }
-
-        .svg-icon { width: 24px; height: 24px; stroke: var(--neon-light); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
+        /* Типографика как на фото */
+        h1, h2, h3, .font-title { font-family: 'Unbounded', sans-serif; letter-spacing: -0.5px; }
+        .text-gradient { background: linear-gradient(90deg, #fff, var(--neon-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         /* --- ШАПКА --- */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 10px 5px; }
-        .logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
-        .logo svg { width: 28px; height: 28px; stroke: var(--neon-light); }
-        .logo span { color: var(--text-main); }
+        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+        .logo-wrap { display: flex; flex-direction: column; gap: 5px; }
+        .logo { display: flex; align-items: center; gap: 8px; font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 800; }
+        .logo svg { width: 24px; height: 24px; stroke: var(--neon-light); fill: none; }
+        .logo-sub { font-size: 9px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; font-weight: 600; margin-left: 32px; }
         
-        .support-btn-top { 
+        .support-btn { 
             display: flex; align-items: center; gap: 8px;
-            background: rgba(157, 78, 221, 0.1); border: 1px solid var(--glass-border); 
-            padding: 8px 16px; border-radius: 20px; text-decoration: none; color: var(--text-main);
-            font-size: 12px; font-weight: 600; transition: all 0.3s;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 14px; border-radius: 12px; text-decoration: none; color: #fff;
+            font-size: 11px; font-weight: 600; transition: 0.2s;
         }
-        .support-btn-top:hover { background: rgba(157, 78, 221, 0.2); border-color: var(--glass-border-hover); }
-        .support-btn-top svg { width: 16px; height: 16px; stroke: var(--neon-light); }
+        .support-btn svg { width: 16px; height: 16px; stroke: var(--neon-light); fill: none; }
+        .support-btn:active { transform: scale(0.95); }
 
-        /* --- ПРИВЕТСТВЕННЫЙ БАННЕР --- */
-        .welcome-banner {
-            position: relative; border-radius: 24px; padding: 30px 20px; margin-bottom: 30px;
-            background: linear-gradient(135deg, rgba(30, 10, 60, 0.8) 0%, rgba(10, 5, 20, 0.9) 100%);
-            border: 1px solid var(--glass-border); overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }
-        .welcome-banner::before {
-            content: ''; position: absolute; top: 0; right: 0; width: 150px; height: 150px;
-            background: radial-gradient(circle, rgba(157, 78, 221, 0.3) 0%, transparent 70%);
-            transform: translate(30%, -30%); border-radius: 50%; pointer-events: none;
-        }
-        
-        .banner-tag { font-size: 12px; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; font-weight: 600; }
-        .banner-title { font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 15px; }
-        .banner-title span { color: var(--neon-light); text-shadow: 0 0 20px rgba(199, 164, 255, 0.5); }
-        .banner-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; max-width: 70%; line-height: 1.5; }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--neon-purple) 0%, #5a189a 100%);
-            color: #fff; border: none; padding: 16px; border-radius: 16px;
-            font-size: 15px; font-weight: 700; width: 100%; cursor: pointer;
-            box-shadow: 0 5px 20px rgba(157, 78, 221, 0.4); transition: transform 0.2s;
-            display: flex; justify-content: center; align-items: center; gap: 10px;
-        }
-        .btn-primary:active { transform: scale(0.98); }
+        /* --- БАННЕР / ЗАГОЛОВОК --- */
+        .hero { position: relative; margin-bottom: 25px; padding: 10px 0; }
+        .hero-tag { font-size: 12px; letter-spacing: 4px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
+        .hero-title { font-size: 38px; font-weight: 800; line-height: 1; margin-bottom: 5px; text-transform: uppercase; }
+        .hero-sub { font-size: 11px; letter-spacing: 3px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
 
-        /* --- ХИТЫ ПРОДАЖ (СЛАЙДЕР) --- */
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .section-title { font-size: 18px; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px; }
-        
-        .slider-wrapper { width: 100%; overflow: hidden; margin-bottom: 25px; border-radius: 20px; }
-        .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 15px; padding-bottom: 5px; }
-        .slider-container::-webkit-scrollbar { display: none; }
-        
-        .slide-card {
-            min-width: 100%; background: var(--bg-card); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 20px; scroll-snap-align: center;
-            display: flex; flex-direction: column; justify-content: space-between;
-            backdrop-filter: blur(10px); box-shadow: inset 0 0 20px rgba(157, 78, 221, 0.05);
-            position: relative; overflow: hidden;
-        }
-        .slide-card::after {
-            content: ''; position: absolute; bottom: -20px; right: -20px; width: 80px; height: 80px;
-            background: radial-gradient(circle, rgba(157, 78, 221, 0.2), transparent 70%); border-radius: 50%;
-        }
-        
-        .slide-title { font-size: 20px; font-weight: 800; margin-bottom: 5px; }
-        .slide-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px; }
-        .slide-footer { display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1; }
-        .slide-price { font-size: 22px; font-weight: 800; color: var(--neon-light); text-shadow: 0 0 10px rgba(199, 164, 255, 0.3); }
-        .btn-buy {
-            background: rgba(199, 164, 255, 0.1); border: 1px solid var(--glass-border); color: #fff;
-            padding: 10px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-buy:hover { background: rgba(199, 164, 255, 0.25); border-color: var(--neon-light); }
-
-        .pagination { display: flex; justify-content: center; gap: 6px; margin-bottom: 30px; }
-        .dot { width: 20px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; transition: 0.3s; }
-        .dot.active { background: var(--neon-purple); width: 30px; box-shadow: 0 0 10px var(--neon-purple); }
-
-        /* --- КАТАЛОГ / ПРАЙС --- */
+        /* --- ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ (КАК НА ФОТО) --- */
         .currency-switcher {
-            display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
-            background: rgba(0,0,0,0.3); padding: 5px; border-radius: 14px; border: 1px solid var(--glass-border);
+            display: flex; background: rgba(20, 11, 36, 0.8); border: 1px solid var(--border);
+            border-radius: 16px; padding: 5px; margin-bottom: 20px; position: relative; z-index: 10;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
         }
         .currency-btn {
-            flex: 1; padding: 10px; border-radius: 10px; border: none; background: transparent;
-            color: var(--text-muted); font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s;
+            flex: 1; padding: 12px; border-radius: 12px; border: none; background: transparent;
+            color: var(--text-muted); font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.3s;
+            font-family: 'Unbounded', sans-serif;
         }
-        .currency-btn.active { background: var(--neon-purple); color: #fff; box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4); }
+        .currency-btn.active {
+            background: linear-gradient(180deg, var(--bg-card-light) 0%, var(--bg-card) 100%);
+            color: #fff; box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
 
-        .price-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-        .price-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-card); border: 1px solid var(--glass-border);
-            padding: 16px 20px; border-radius: 16px; backdrop-filter: blur(10px);
-            cursor: pointer; transition: all 0.2s;
-        }
-        .price-item:hover { border-color: var(--glass-border-hover); background: rgba(30, 15, 50, 0.8); }
-        .price-item:active { transform: scale(0.98); }
+        /* --- СЕТКА ЦЕН (ДВЕ КОЛОНКИ КАК НА ФОТО) --- */
+        .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
         
-        .price-left { display: flex; align-items: center; gap: 12px; }
-        .price-coin-icon { width: 28px; height: 28px; background: rgba(157, 78, 221, 0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--neon-light); font-weight: 800; font-size: 12px; }
-        .price-amount { font-size: 18px; font-weight: 800; color: var(--text-main); }
-        .price-millions { font-size: 15px; font-weight: 600; color: var(--text-muted); }
+        .price-pill {
+            /* Объемная капсула */
+            background: linear-gradient(180deg, rgba(35, 19, 63, 0.8) 0%, rgba(20, 11, 36, 0.9) 100%);
+            border: 1px solid rgba(138, 43, 226, 0.15);
+            border-radius: 20px; padding: 15px 12px;
+            display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
+        }
+        .price-pill::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%); pointer-events: none;
+        }
+        .price-pill:active { transform: scale(0.96); border-color: var(--neon); box-shadow: 0 0 15px rgba(138, 43, 226, 0.3); }
+        
+        .price-val { font-size: 16px; font-weight: 800; font-family: 'Unbounded', sans-serif; color: #fff; z-index: 1; }
+        .price-m { font-size: 14px; font-weight: 700; color: var(--neon-light); display: flex; align-items: center; gap: 5px; z-index: 1; }
+        .price-m svg { width: 14px; height: 14px; stroke: var(--neon-light); fill: none; }
 
-        /* --- ПРЕИМУЩЕСТВА --- */
-        .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+        /* --- ПРЕИМУЩЕСТВА (КАК НА ФОТО) --- */
+        .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .feature-card {
-            background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px;
-            padding: 20px 15px; text-align: center; backdrop-filter: blur(10px);
+            background: linear-gradient(180deg, rgba(20, 11, 36, 0.8) 0%, rgba(10, 5, 20, 0.9) 100%);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 16px;
+            padding: 15px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;
         }
-        .feature-icon { margin-bottom: 10px; }
-        .feature-icon svg { width: 28px; height: 28px; stroke: var(--neon-purple); }
-        .feature-text { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        .feature-icon svg { width: 24px; height: 24px; stroke: var(--neon-light); fill: none; filter: drop-shadow(0 0 5px rgba(138,43,226,0.5)); }
+        .feature-text { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); line-height: 1.3; }
 
-        /* --- ПОДДЕРЖКА (ВНИЗУ) --- */
-        .contact-btn-wide {
+        /* --- КНОПКА ПОДДЕРЖКИ ВНИЗУ --- */
+        .contact-btn {
             display: flex; align-items: center; gap: 15px;
-            background: linear-gradient(90deg, rgba(157, 78, 221, 0.15) 0%, rgba(90, 24, 154, 0.15) 100%);
-            border: 1px solid var(--glass-border); border-radius: 20px; padding: 16px 20px;
-            text-decoration: none; color: #fff; transition: all 0.2s; margin-bottom: 20px;
+            background: linear-gradient(90deg, rgba(138, 43, 226, 0.15) 0%, rgba(138, 43, 226, 0.05) 100%);
+            border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 50px; padding: 10px 20px 10px 10px;
+            text-decoration: none; color: #fff; transition: 0.2s;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.15);
         }
-        .contact-btn-wide:active { transform: scale(0.98); }
-        .contact-icon-wrap { width: 45px; height: 45px; background: var(--neon-purple); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(157, 78, 221, 0.5); }
-        .contact-icon-wrap svg { width: 22px; height: 22px; stroke: #fff; margin-left: -2px; }
+        .contact-btn:active { transform: scale(0.98); }
+        .contact-icon { width: 40px; height: 40px; background: var(--neon); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px var(--neon); }
+        .contact-icon svg { width: 20px; height: 20px; stroke: #fff; fill: none; margin-left: -2px; }
         .contact-text { flex: 1; }
-        .contact-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
-        .contact-desc { font-size: 15px; font-weight: 700; color: #fff; }
+        .contact-title { font-size: 9px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
+        .contact-desc { font-size: 14px; font-weight: 800; font-family: 'Unbounded', sans-serif; }
+        .arrow-circle { width: 32px; height: 32px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+        .arrow-circle svg { width: 16px; height: 16px; stroke: #fff; fill: none; }
 
-        /* --- НИЖНЕЕ МЕНЮ --- */
+        /* --- НИЖНЕЕ МЕНЮ (КАПСУЛА) --- */
         .bottom-nav { 
             position: fixed; bottom: 15px; left: 15px; right: 15px; 
-            background: rgba(15, 5, 30, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            display: flex; justify-content: space-around; padding: 10px 8px; border-radius: 25px; 
-            border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 100;
+            background: rgba(15, 5, 30, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; padding: 10px 8px; border-radius: 30px; 
+            border: 1px solid rgba(138, 43, 226, 0.2); box-shadow: 0 10px 40px rgba(0,0,0,0.9); z-index: 100;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6b5b8e; font-size: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 60px; position: relative;}
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6b5b8e; font-size: 9px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 65px; position: relative;}
         .nav-icon-wrap { width: 44px; height: 36px; display: flex; justify-content: center; align-items: center; border-radius: 14px; transition: 0.3s; }
-        .nav-item svg { width: 22px; height: 22px; stroke: #6b5b8e; transition: 0.3s; }
+        .nav-item svg { width: 22px; height: 22px; stroke: #6b5b8e; transition: 0.3s; fill: none; }
         .nav-item.active { color: #fff; }
-        .nav-item.active .nav-icon-wrap { background: rgba(157, 78, 221, 0.2); box-shadow: inset 0 0 10px rgba(157, 78, 221, 0.2); }
-        .nav-item.active svg { stroke: var(--neon-light); filter: drop-shadow(0 0 5px rgba(199,164,255,0.5)); }
+        .nav-item.active .nav-icon-wrap { background: rgba(138, 43, 226, 0.2); box-shadow: inset 0 0 10px rgba(138, 43, 226, 0.3); }
+        .nav-item.active svg { stroke: var(--neon-light); filter: drop-shadow(0 0 5px rgba(138,43,226,0.6)); }
 
         .cart-badge {
-            position: absolute; top: -2px; right: 5px; background: #ff0055; color: white; font-size: 10px; font-weight: 800;
+            position: absolute; top: -2px; right: 5px; background: var(--neon); color: white; font-size: 10px; font-weight: 800;
             min-width: 18px; height: 18px; border-radius: 9px; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 0 10px rgba(255, 0, 85, 0.6); display: none;
+            box-shadow: 0 0 10px var(--neon); display: none;
         }
 
+        /* --- ОБЩИЕ ЭЛЕМЕНТЫ ВКЛАДОК --- */
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- МОДАЛЬНЫЕ ОКНА (СТЕКЛО) --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            display: none; justify-content: center; align-items: center; z-index: 600;
-        }
-        .modal-overlay.active { display: flex; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-top: 10px; }
+        .section-title { font-size: 18px; font-weight: 800; font-family: 'Unbounded', sans-serif; }
         
-        .modal-content {
-            background: linear-gradient(135deg, rgba(30, 10, 60, 0.95) 0%, rgba(10, 5, 20, 0.98) 100%);
-            border: 1px solid var(--glass-border); border-radius: 24px;
-            padding: 30px 25px; width: 90%; max-width: 340px; text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(157,78,221,0.1); 
-            position: relative;
-        }
-        
-        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #fff; }
-        
-        .modal-input {
-            width: 100%; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--glass-border);
-            color: #fff; padding: 15px; border-radius: 12px; font-size: 18px; text-align: center;
-            margin-bottom: 20px; outline: none; font-weight: 600; transition: border 0.2s;
-        }
-        .modal-input:focus { border-color: var(--neon-light); box-shadow: 0 0 10px rgba(157,78,221,0.3); }
-        
-        .modal-actions { display: flex; gap: 10px; }
-        .modal-btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: transform 0.1s;}
-        .modal-btn:active { transform: scale(0.95); }
-        .btn-cancel { background: rgba(255,255,255,0.1); color: var(--text-muted); }
-        .btn-confirm { background: linear-gradient(135deg, var(--neon-purple) 0%, #5a189a 100%); color: #fff; box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4); }
-
-        /* --- КОРЗИНА --- */
-        .cart-empty { display: flex; flex-direction: column; align-items: center; padding: 50px 20px; text-align: center; }
-        .cart-empty svg { width: 60px; height: 60px; stroke: var(--text-muted); margin-bottom: 15px; opacity: 0.5; }
-        .cart-empty p { color: var(--text-muted); font-size: 15px; font-weight: 500; }
-
+        /* Корзина и заказы */
         .cart-item {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-card); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 16px; margin-bottom: 10px; backdrop-filter: blur(10px);
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 15px; margin-bottom: 10px; 
         }
         .cart-item-info h4 { font-size: 15px; color: #fff; margin-bottom: 4px; font-weight: 700; }
         .cart-item-info p { font-size: 13px; color: var(--neon-light); font-weight: 600; }
         .btn-delete-item {
             background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3);
-            color: #ff0055; padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: background 0.2s;
+            color: #ff0055; padding: 8px; border-radius: 10px; cursor: pointer;
         }
-        .btn-delete-item:hover { background: rgba(255, 0, 85, 0.2); }
+        .btn-delete-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
+        
+        .cart-empty { display: flex; flex-direction: column; align-items: center; padding: 50px 20px; text-align: center; }
+        .cart-empty svg { width: 60px; height: 60px; stroke: var(--text-muted); margin-bottom: 15px; opacity: 0.5; fill: none; }
+        .cart-empty p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 
-        .btn-checkout {
-            background: linear-gradient(135deg, var(--neon-purple) 0%, #5a189a 100%);
+        .btn-primary {
+            background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%);
             color: #fff; border: none; padding: 16px; border-radius: 16px;
-            font-size: 16px; font-weight: 700; width: 100%; cursor: pointer;
-            margin-top: 20px; box-shadow: 0 5px 20px rgba(157, 78, 221, 0.4);
+            font-size: 15px; font-weight: 800; font-family: 'Unbounded', sans-serif;
+            width: 100%; cursor: pointer; box-shadow: 0 4px 20px rgba(157, 78, 221, 0.4);
+            transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px;
         }
-        .btn-checkout:active { transform: scale(0.97); }
+        .btn-primary:active { transform: scale(0.97); }
 
-        /* --- КРАСИВОЕ УВЕДОМЛЕНИЕ --- */
-        .success-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px);
-            display: none; justify-content: center; align-items: center; z-index: 700;
-        }
+        /* Модалки */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 600; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: linear-gradient(180deg, var(--bg-card-light) 0%, var(--bg-card) 100%); border: 1px solid var(--border); border-radius: 24px; padding: 25px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 0 50px rgba(138, 43, 226, 0.2); }
+        .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; font-family: 'Unbounded', sans-serif; }
+        .modal-input { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; font-size: 18px; text-align: center; margin-bottom: 20px; font-weight: 700; outline: none; font-family: 'Unbounded', sans-serif;}
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; }
+        .btn-cancel { background: rgba(255,255,255,0.1); color: var(--text-muted); }
+        .btn-confirm { background: var(--neon); color: #fff; box-shadow: 0 0 15px rgba(138,43,226,0.4); }
+
+        /* Успех */
+        .success-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 700; }
         .success-overlay.active { display: flex; }
-        
-        .success-box {
-            background: linear-gradient(135deg, rgba(30, 10, 60, 0.95) 0%, rgba(10, 5, 20, 0.98) 100%);
-            border: 1px solid var(--glass-border); border-radius: 30px;
-            padding: 35px 30px; width: 90%; max-width: 320px; text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(157, 78, 221, 0.2); 
-        }
-
-        .checkmark-container { width: 80px; height: 80px; margin: 0 auto 20px; position: relative; }
-        .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon-purple); fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
-        .checkmark-bg { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon-purple); fill: rgba(157, 78, 221, 0.1); animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
-        .checkmark-check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; stroke-width: 4; stroke: var(--neon-light); fill: none; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
+        .success-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 30px; padding: 30px 20px; width: 90%; max-width: 320px; text-align: center; }
+        .checkmark-container { width: 70px; height: 70px; margin: 0 auto 20px; position: relative; }
+        .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon); fill: none; animation: stroke 0.6s forwards; }
+        .checkmark-check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; stroke-width: 4; stroke: var(--neon-light); fill: none; animation: stroke 0.3s 0.6s forwards; }
         @keyframes stroke { 100% { stroke-dashoffset: 0; } }
-
-        .success-title { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 10px; }
-        .success-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; }
-        
-        .btn-close-success {
-            background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border);
-            color: #fff; padding: 14px 20px; border-radius: 14px; font-size: 15px; font-weight: 700;
-            width: 100%; cursor: pointer; transition: background 0.2s;
-        }
     </style>
 </head>
 <body>
 
-    <!-- СВЕЧЕНИЕ НА ФОНЕ -->
-    <div class="bg-glow-1"></div>
-    <div class="bg-glow-2"></div>
-
     <!-- ШАПКА -->
     <div class="top-bar">
-        <div class="logo" onclick="switchTab('home', document.getElementById('nav-home'))">
-            <svg viewBox="0 0 24 24"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"></path></svg>
-            <span>ONEBOOST</span>
+        <div class="logo-wrap">
+            <div class="logo" onclick="switchTab('home', document.getElementById('nav-home'))">
+                <svg viewBox="0 0 24 24"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"></path></svg>
+                <span>ONEBOOST</span>
+            </div>
+            <div class="logo-sub">Быстро · Безопасно · Надежно</div>
         </div>
-        <a href="https://t.me/Oneboostmanager" target="_blank" class="support-btn-top">
+        <a href="https://t.me/Oneboostmanager" target="_blank" class="support-btn">
             <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-            ПОДДЕРЖКА
+            ПОДДЕРЖКА 24/7
         </a>
     </div>
 
     <!-- ВКЛАДКА: ГЛАВНАЯ -->
     <div id="tab-home" class="tab-content active">
         
-        <!-- БАННЕР -->
-        <div class="welcome-banner">
-            <div class="banner-tag">ARENA BREAKOUT</div>
-            <div class="banner-title">ПРАЙС <span>ЛИСТ</span></div>
-            <div class="banner-desc">Быстрый буст миллионов. Надежно и с гарантией.</div>
-            <button class="btn-primary" onclick="switchTab('catalog', document.getElementById('nav-catalog'))">
-                ПЕРЕЙТИ В КАТАЛОГ
-            </button>
+        <div class="hero">
+            <div class="hero-tag">ARENA BREAKOUT</div>
+            <div class="hero-title">ПРАЙС <span class="text-gradient">ЛИСТ</span></div>
+            <div class="hero-sub">Быстрый буст миллионов</div>
         </div>
 
-        <!-- ХИТЫ ПРОДАЖ -->
-        <div class="section-header">
-            <div class="section-title">Хиты продаж</div>
+        <!-- ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ -->
+        <div class="currency-switcher">
+            <button class="currency-btn active" onclick="changeCurrency('rub', this)">₽ RUB</button>
+            <button class="currency-btn" onclick="changeCurrency('uah', this)">₴ UAH</button>
+            <button class="currency-btn" onclick="changeCurrency('usd', this)">$ USD</button>
         </div>
-        <div class="slider-wrapper">
-            <div class="slider-container" id="slider">
-                <div class="slide-card">
-                    <div>
-                        <div class="slide-title">Буст 10 млн</div>
-                        <div class="slide-desc">Мгновенный фарм коинов. Наши топ-игроки выполнят заказ в кратчайшие сроки.</div>
-                    </div>
-                    <div class="slide-footer">
-                        <div class="slide-price" id="hit-price-1">2 200 ₽</div>
-                        <button class="btn-buy" onclick="addToCart('Буст', '10 млн')">Заказать</button>
-                    </div>
-                </div>
-                <div class="slide-card">
-                    <div>
-                        <div class="slide-title">Сопровождение 5 млн</div>
-                        <div class="slide-desc">Играем в одной команде. Приносим вам лучший лут без вашего участия.</div>
-                    </div>
-                    <div class="slide-footer">
-                        <div class="slide-price" id="hit-price-2">1 300 ₽</div>
-                        <button class="btn-buy" onclick="addToCart('Сопровождение', '5 млн')">Заказать</button>
-                    </div>
-                </div>
+
+        <!-- СЕТКА ЦЕН -->
+        <div class="price-grid">
+            <div class="price-pill" onclick="addToCart('Буст', '5 млн', 1300)">
+                <div class="price-val price-val-node" data-rub="1 300 ₽" data-uah="720 ₴" data-usd="$15">1 300 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 5M</div>
+            </div>
+            <div class="price-pill" onclick="addToCart('Буст', '60 млн', 12500)">
+                <div class="price-val price-val-node" data-rub="12 500 ₽" data-uah="6 910 ₴" data-usd="$152">12 500 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 60M</div>
+            </div>
+            <div class="price-pill" onclick="addToCart('Буст', '10 млн', 2200)">
+                <div class="price-val price-val-node" data-rub="2 200 ₽" data-uah="1 210 ₴" data-usd="$27">2 200 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 10M</div>
+            </div>
+            <div class="price-pill" onclick="addToCart('Буст', '70 млн', 14500)">
+                <div class="price-val price-val-node" data-rub="14 500 ₽" data-uah="8 010 ₴" data-usd="$176">14 500 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 70M</div>
+            </div>
+            <div class="price-pill" onclick="addToCart('Буст', '20 млн', 4400)">
+                <div class="price-val price-val-node" data-rub="4 400 ₽" data-uah="2 430 ₴" data-usd="$53">4 400 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 20M</div>
+            </div>
+            <div class="price-pill" onclick="addToCart('Буст', '80 млн', 16100)">
+                <div class="price-val price-val-node" data-rub="16 100 ₽" data-uah="8 900 ₴" data-usd="$195">16 100 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 80M</div>
+            </div>
+            <div class="price-pill" onclick="addToCart('Буст', '30 млн', 6500)">
+                <div class="price-val price-val-node" data-rub="6 500 ₽" data-uah="3 590 ₴" data-usd="$79">6 500 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 30M</div>
+            </div>
+            <div class="price-pill" onclick="addToCart('Буст', '90 млн', 18100)">
+                <div class="price-val price-val-node" data-rub="18 100 ₽" data-uah="10 000 ₴" data-usd="$220">18 100 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 90M</div>
+            </div>
+            <div class="price-pill" onclick="addToCart('Буст', '40 млн', 8500)">
+                <div class="price-val price-val-node" data-rub="8 500 ₽" data-uah="4 690 ₴" data-usd="$103">8 500 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 40M</div>
+            </div>
+            <div class="price-pill" onclick="addToCart('Буст', '100 млн', 19600)">
+                <div class="price-val price-val-node" data-rub="19 600 ₽" data-uah="10 830 ₴" data-usd="$238">19 600 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 100M</div>
+            </div>
+            <div class="price-pill" onclick="addToCart('Буст', '50 млн', 10600)">
+                <div class="price-val price-val-node" data-rub="10 600 ₽" data-uah="5 860 ₴" data-usd="$129">10 600 ₽</div>
+                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 50M</div>
             </div>
         </div>
-        <div class="pagination" id="pagination">
-            <div class="dot active"></div>
-            <div class="dot"></div>
-        </div>
+
+        <button class="btn-primary" style="margin-bottom: 30px;" onclick="openModal('Буст')">
+            ДРУГОЕ КОЛИЧЕСТВО
+        </button>
 
         <!-- ПРЕИМУЩЕСТВА -->
         <div class="features-grid">
@@ -367,101 +310,44 @@
             </div>
         </div>
 
-        <!-- КНОПКА ПОДДЕРЖКИ -->
-        <a href="https://t.me/Oneboostmanager" target="_blank" class="contact-btn-wide">
-            <div class="contact-icon-wrap">
+        <!-- КНОПКА СВЯЗИ -->
+        <a href="https://t.me/Oneboostmanager" target="_blank" class="contact-btn">
+            <div class="contact-icon">
                 <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </div>
             <div class="contact-text">
                 <div class="contact-title">НАПИШИ В TELEGRAM</div>
-                <div class="contact-desc">ПОЛУЧИ БУСТ УЖЕ СЕЙЧАС</div>
+                <div class="contact-desc">ПОЛУЧИ БУСТ СЕЙЧАС</div>
+            </div>
+            <div class="arrow-circle">
+                <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
         </a>
     </div>
 
-    <!-- ВКЛАДКА: КАТАЛОГ -->
-    <div id="tab-catalog" class="tab-content">
-        <div class="section-title" style="text-align: center; margin-bottom: 20px; font-size: 22px;">ПРАЙС ЛИСТ</div>
-        
-        <!-- ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ -->
-        <div class="currency-switcher">
-            <button class="currency-btn active" onclick="changeCurrency('rub', this)">₽ RUB</button>
-            <button class="currency-btn" onclick="changeCurrency('uah', this)">₴ UAH</button>
-            <button class="currency-btn" onclick="changeCurrency('usd', this)">$ USD</button>
-        </div>
-
-        <div class="price-list">
-            <div class="price-item" onclick="addToCart('Буст', '5 млн', 1300)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="1 300 ₽" data-uah="720 ₴" data-usd="$15">1 300 ₽</div></div>
-                <div class="price-millions">5M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '10 млн', 2200)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="2 200 ₽" data-uah="1 210 ₴" data-usd="$27">2 200 ₽</div></div>
-                <div class="price-millions">10M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '20 млн', 4400)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="4 400 ₽" data-uah="2 430 ₴" data-usd="$53">4 400 ₽</div></div>
-                <div class="price-millions">20M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '30 млн', 6500)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="6 500 ₽" data-uah="3 590 ₴" data-usd="$79">6 500 ₽</div></div>
-                <div class="price-millions">30M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '40 млн', 8500)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="8 500 ₽" data-uah="4 690 ₴" data-usd="$103">8 500 ₽</div></div>
-                <div class="price-millions">40M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '50 млн', 10600)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="10 600 ₽" data-uah="5 860 ₴" data-usd="$129">10 600 ₽</div></div>
-                <div class="price-millions">50M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '60 млн', 12500)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="12 500 ₽" data-uah="6 910 ₴" data-usd="$152">12 500 ₽</div></div>
-                <div class="price-millions">60M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '70 млн', 14500)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="14 500 ₽" data-uah="8 010 ₴" data-usd="$176">14 500 ₽</div></div>
-                <div class="price-millions">70M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '80 млн', 16100)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="16 100 ₽" data-uah="8 900 ₴" data-usd="$195">16 100 ₽</div></div>
-                <div class="price-millions">80M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '90 млн', 18100)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="18 100 ₽" data-uah="10 000 ₴" data-usd="$220">18 100 ₽</div></div>
-                <div class="price-millions">90M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '100 млн', 19600)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="19 600 ₽" data-uah="10 830 ₴" data-usd="$238">19 600 ₽</div></div>
-                <div class="price-millions">100M</div>
-            </div>
-        </div>
-
-        <button class="btn-primary" style="margin-bottom: 25px;" onclick="openModal('Буст')">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="stroke: #fff; width: 18px; height: 18px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-            ДРУГОЕ КОЛИЧЕСТВО
-        </button>
-    </div>
-
     <!-- ВКЛАДКА: КОРЗИНА -->
     <div id="tab-cart" class="tab-content">
-        <h2 class="section-title" style="text-align: center; margin-bottom: 20px;">КОРЗИНА</h2>
+        <div class="section-header">
+            <div class="section-title">КОРЗИНА</div>
+        </div>
         <div id="cart-items-container"></div>
         <div id="cart-empty-state" class="cart-empty">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             <p>Ваша корзина пуста</p>
         </div>
-        <button id="checkout-btn" class="btn-checkout" style="display: none;" onclick="openCheckoutConfirm()">ОФОРМИТЬ ЗАКАЗ</button>
+        <button id="checkout-btn" class="btn-primary" style="display: none;" onclick="openCheckoutConfirm()">ОФОРМИТЬ ЗАКАЗ</button>
     </div>
 
     <!-- ВКЛАДКА: ЗАКАЗЫ -->
     <div id="tab-orders" class="tab-content">
-        <h2 class="section-title" style="text-align: center; margin-bottom: 20px;">МОИ ЗАКАЗЫ</h2>
+        <div class="section-header">
+            <div class="section-title">МОИ ЗАКАЗЫ</div>
+        </div>
         <div id="orders-list-container"></div>
         <div id="orders-empty" class="cart-empty" style="display: none;">
-            <svg viewBox="0 0 24 24" fill="none" style="stroke: var(--neon-purple);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
             <p style="color: #fff; font-weight: 700; margin-bottom: 10px;">У вас пока нет заказов</p>
-            <p style="font-size: 13px;">Заказы, сделанные через кнопки в боте, смотрите в самом боте.</p>
+            <p style="font-size: 13px;">Заказы из бота смотрите в самом боте.</p>
         </div>
     </div>
 
@@ -470,10 +356,6 @@
         <div class="nav-item active" id="nav-home" onclick="switchTab('home', this)">
             <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
             <div>Главная</div>
-        </div>
-        <div class="nav-item" id="nav-catalog" onclick="switchTab('catalog', this)">
-            <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
-            <div>Прайс</div>
         </div>
         <div class="nav-item" id="nav-cart" onclick="switchTab('cart', this)">
             <div class="nav-icon-wrap">
@@ -488,10 +370,10 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО: Свое количество -->
+    <!-- МОДАЛЬНЫЕ ОКНА -->
     <div class="modal-overlay" id="customModal">
         <div class="modal-content">
-            <div class="modal-title">Введите количество миллионов</div>
+            <div class="modal-title">Введите количество</div>
             <input type="number" id="customAmountInput" class="modal-input" placeholder="Например: 15" min="1">
             <div class="modal-actions">
                 <button class="modal-btn btn-cancel" onclick="closeModal()">Отмена</button>
@@ -500,86 +382,62 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО: Добавить в корзину? -->
     <div class="modal-overlay" id="confirmAddModal">
         <div class="modal-content">
             <div class="modal-title" id="confirmAddTitle">Добавить в корзину?</div>
             <div class="modal-actions">
                 <button class="modal-btn btn-cancel" onclick="cancelAdd()">Отмена</button>
-                <button class="modal-btn btn-confirm" onclick="confirmAdd()">Да, добавить</button>
+                <button class="modal-btn btn-confirm" onclick="confirmAdd()">Да</button>
             </div>
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО: Подтверждение оформления -->
     <div class="modal-overlay" id="checkoutConfirmModal">
         <div class="modal-content">
             <div class="modal-title" id="checkoutConfirmTitle">Оформить заказ?</div>
             <div class="modal-actions">
                 <button class="modal-btn btn-cancel" onclick="closeCheckoutConfirm()">Отмена</button>
-                <button class="modal-btn btn-confirm" onclick="confirmCheckout()">Да, оформить</button>
+                <button class="modal-btn btn-confirm" onclick="confirmCheckout()">Да</button>
             </div>
         </div>
     </div>
 
-    <!-- УВЕДОМЛЕНИЕ ОБ УСПЕХЕ -->
     <div class="success-overlay" id="successModal">
         <div class="success-box">
             <div class="checkmark-container">
                 <svg viewBox="0 0 52 52">
-                    <circle class="checkmark-bg" cx="26" cy="26" r="25" />
                     <circle class="checkmark-circle" cx="26" cy="26" r="25" />
                     <path class="checkmark-check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
                 </svg>
             </div>
-            <div class="success-title">Заказ оформлен!</div>
-            <div class="success-desc">Менеджер свяжется с вами в ближайшее время для уточнения деталей.</div>
-            <button class="btn-close-success" onclick="closeSuccessModal()">Закрыть</button>
+            <div class="modal-title">Заказ оформлен!</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">Менеджер свяжется с вами.</div>
+            <button class="btn-primary" onclick="closeSuccessModal()">Закрыть</button>
         </div>
     </div>
 
     <script>
-        // --- 1. БАЗОВАЯ ИНИЦИАЛИЗАЦИЯ ---
         var tg = window.Telegram ? window.Telegram.WebApp : null;
         if (tg) {
             tg.ready();
             tg.expand();
-            if (tg.setHeaderColor) tg.setHeaderColor('#05020a');
-            if (tg.setBackgroundColor) tg.setBackgroundColor('#05020a');
-            
-            var user = tg.initDataUnsafe.user;
-            if (user) {
-                var bannerTag = document.querySelector('.banner-tag');
-                if (bannerTag) bannerTag.innerText = 'ПРИВЕТ, ' + user.first_name.toUpperCase();
-            }
+            if (tg.setHeaderColor) tg.setHeaderColor('#06030a');
+            if (tg.setBackgroundColor) tg.setBackgroundColor('#06030a');
         }
 
-        // --- 2. ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ ---
-        var currentCurrency = 'rub';
-
+        // --- ВАЛЮТА ---
         function changeCurrency(currency, btn) {
-            currentCurrency = currency;
-            
-            // Меняем активную кнопку
             document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            // Меняем все цены в прайсе
-            document.querySelectorAll('.price-val').forEach(function(el) {
+            document.querySelectorAll('.price-val-node').forEach(function(el) {
                 if (currency === 'rub') el.innerText = el.getAttribute('data-rub');
                 if (currency === 'uah') el.innerText = el.getAttribute('data-uah');
                 if (currency === 'usd') el.innerText = el.getAttribute('data-usd');
             });
-            
-            // Меняем цены в хитах продаж (упрощенно)
-            var hit1 = document.getElementById('hit-price-1');
-            var hit2 = document.getElementById('hit-price-2');
-            if(currency === 'rub') { if(hit1) hit1.innerText = '2 200 ₽'; if(hit2) hit2.innerText = '1 300 ₽'; }
-            if(currency === 'uah') { if(hit1) hit1.innerText = '1 210 ₴'; if(hit2) hit2.innerText = '720 ₴'; }
-            if(currency === 'usd') { if(hit1) hit1.innerText = '$27'; if(hit2) hit2.innerText = '$15'; }
         }
 
-        // --- 3. НАВИГАЦИЯ ---
+        // --- НАВИГАЦИЯ ---
         function switchTab(tabName, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
@@ -587,83 +445,49 @@
             var activeTab = document.getElementById('tab-' + tabName);
             if (activeTab) activeTab.classList.add('active');
             
-            if (element) {
-                element.classList.add('active');
-            } else {
-                var navItems = document.querySelectorAll('.nav-item');
-                var index = ['home', 'catalog', 'cart', 'orders'].indexOf(tabName);
-                if (index !== -1 && navItems[index]) navItems[index].classList.add('active');
-            }
-
+            if (element) element.classList.add('active');
             if (tabName === 'orders') renderOrders();
         }
 
-        // --- 4. КОРЗИНА ---
+        // --- КОРЗИНА ---
         var cart = [];
         var pendingItem = null;
 
         function loadCart() {
             try {
                 var saved = localStorage.getItem('oneboost_cart');
-                if (saved) {
-                    cart = JSON.parse(saved);
-                    updateCartUI();
-                }
+                if (saved) { cart = JSON.parse(saved); updateCartUI(); }
             } catch (e) {}
         }
 
         function saveCart() {
-            try {
-                localStorage.setItem('oneboost_cart', JSON.stringify(cart));
-            } catch (e) {}
+            try { localStorage.setItem('oneboost_cart', JSON.stringify(cart)); } catch (e) {}
         }
 
-        function addToCart(service, amount, priceRub) {
+        function addToCart(service, amount, price) {
             if (cart.length >= 5) return alert('Максимум 5 позиций');
-            
-            pendingItem = { service: service, amount: amount, price: priceRub || 0 };
-            var title = document.getElementById('confirmAddTitle');
-            if (title) title.innerText = 'Добавить ' + service + ' (' + amount + ') в корзину?';
+            pendingItem = { service: service, amount: amount, price: price || 0 };
+            document.getElementById('confirmAddTitle').innerText = 'Добавить ' + service + ' (' + amount + ')?';
             document.getElementById('confirmAddModal').classList.add('active');
         }
 
-        function cancelAdd() {
-            document.getElementById('confirmAddModal').classList.remove('active');
-            pendingItem = null;
-        }
-
+        function cancelAdd() { document.getElementById('confirmAddModal').classList.remove('active'); pendingItem = null; }
         function confirmAdd() {
-            if (pendingItem) {
-                cart.push(pendingItem);
-                updateCartUI();
-                saveCart();
-                if (tg) tg.HapticFeedback.notificationOccurred('success');
-            }
+            if (pendingItem) { cart.push(pendingItem); updateCartUI(); saveCart(); if (tg) tg.HapticFeedback.notificationOccurred('success'); }
             cancelAdd();
         }
 
         function openModal(type) {
             pendingItem = { service: type, amount: null, price: 0 }; 
-            var title = document.getElementById('modalTitle');
-            if (title) title.innerText = type === 'Буст' ? 'Количество миллионов' : 'Количество миллионов';
             document.getElementById('customModal').classList.add('active');
             setTimeout(function() { document.getElementById('customAmountInput').focus(); }, 100);
         }
 
-        function closeModal() {
-            document.getElementById('customModal').classList.remove('active');
-            document.getElementById('customAmountInput').value = '';
-            pendingItem = null;
-        }
-
+        function closeModal() { document.getElementById('customModal').classList.remove('active'); document.getElementById('customAmountInput').value = ''; pendingItem = null; }
+        
         function submitCustomOrder() {
-            var input = document.getElementById('customAmountInput');
-            var amount = input ? input.value : null;
-            
-            if (!amount || amount <= 0) {
-                alert('Пожалуйста, введите корректное число!');
-                return;
-            }
+            var amount = document.getElementById('customAmountInput').value;
+            if (!amount || amount <= 0) return alert('Введите число!');
             var serviceType = pendingItem.service;
             closeModal();
             addToCart(serviceType, amount + ' млн', 0);
@@ -685,104 +509,70 @@
             } else {
                 if (emptyState) emptyState.style.display = 'none';
                 if (checkoutBtn) checkoutBtn.style.display = 'block';
-                if (badge) {
-                    badge.style.display = 'flex';
-                    badge.innerText = cart.length;
-                }
+                if (badge) { badge.style.display = 'flex'; badge.innerText = cart.length; }
 
                 cart.forEach(function(item, index) {
                     var div = document.createElement('div');
                     div.className = 'cart-item';
-                    div.innerHTML = '<div class="cart-item-info"><h4>' + item.service + '</h4><p>' + item.amount + '</p></div><button class="btn-delete-item" onclick="removeFromCart(' + index + ')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>';
+                    div.innerHTML = '<div class="cart-item-info"><h4>' + item.service + '</h4><p>' + item.amount + '</p></div><button class="btn-delete-item" onclick="removeFromCart(' + index + ')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>';
                     container.appendChild(div);
                 });
             }
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
-            saveCart();
-        }
+        function removeFromCart(index) { cart.splice(index, 1); updateCartUI(); saveCart(); }
 
-        // --- 5. ОФОРМЛЕНИЕ ---
+        // --- ОФОРМЛЕНИЕ ---
         function openCheckoutConfirm() {
             if (cart.length === 0) return;
-            var title = document.getElementById('checkoutConfirmTitle');
-            if (title) title.innerText = 'Оформить заказ на ' + cart.length + ' позиций?';
+            document.getElementById('checkoutConfirmTitle').innerText = 'Оформить ' + cart.length + ' поз.?';
             document.getElementById('checkoutConfirmModal').classList.add('active');
-            
             var btn = document.querySelector('#checkoutConfirmModal .btn-confirm');
-            btn.innerText = 'Да, оформить';
-            btn.onclick = confirmCheckout;
+            btn.innerText = 'Да'; btn.onclick = confirmCheckout;
         }
 
-        function closeCheckoutConfirm() {
-            document.getElementById('checkoutConfirmModal').classList.remove('active');
-        }
+        function closeCheckoutConfirm() { document.getElementById('checkoutConfirmModal').classList.remove('active'); }
 
         function confirmCheckout() {
             closeCheckoutConfirm();
-            
             var userData = tg.initDataUnsafe.user;
             var userId = userData ? userData.id : null;
             var firstName = userData ? userData.first_name : "Неизвестно";
             var username = userData && userData.username ? "@" + userData.username : "Нет ника";
             
-            if (!userId) return alert("Ошибка: не удалось определить пользователя.");
+            if (!userId) return alert("Ошибка: нет доступа к вашему профилю.");
             
             var profileLink = '<a href="tg://user?id=' + userId + '">' + firstName + '</a>';
             var orderListText = "";
-            cart.forEach(function(item, index) {
-                orderListText += (index + 1) + ". " + item.service + " — " + item.amount + "\n";
-            });
+            cart.forEach(function(item, index) { orderListText += (index + 1) + ". " + item.service + " — " + item.amount + "\n"; });
             
-            var orderText = "⚠️ <b>Новый заказ!</b> (из Mini App)\n\n";
-            orderText += "👤 Клиент: " + profileLink + " (" + username + ")\n";
-            orderText += "🆔 ID: <code>" + userId + "</code>\n\n";
-            orderText += "📦 <b>Состав заказа:</b>\n" + orderListText;
+            var orderText = "⚠️ <b>Новый заказ!</b> (из Mini App)\n\n👤 Клиент: " + profileLink + " (" + username + ")\n🆔 ID: <code>" + userId + "</code>\n\n📦 <b>Заказ:</b>\n" + orderListText;
             
-            // ВСТАВЬ СЮДА НОВЫЙ ТОКЕН
             var BOT_TOKEN = "8955036904:AAEpJcHRPoAV9QxAVMMJGiGGnzjmvZepT20"; 
             var GROUP_ID = "-1004358524484";
             
             fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+                method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ chat_id: GROUP_ID, text: orderText, parse_mode: "HTML" })
             })
-            .then(function(response) { return response.json(); })
+            .then(res => res.json())
             .then(function(data) {
                 if (data.ok) {
                     var groupMsgId = data.result.message_id;
                     var savedOrders = JSON.parse(localStorage.getItem('my_orders_list') || '[]');
-                    var newOrderObj = {
-                        id: groupMsgId,
-                        number: savedOrders.length + 1,
-                        items: cart.map(function(i) { return i.service + " (" + i.amount + ")"; }).join(", "),
-                        status: "active"
-                    };
-                    savedOrders.push(newOrderObj);
+                    savedOrders.push({ id: groupMsgId, number: savedOrders.length + 1, items: cart.map(function(i) { return i.service + " (" + i.amount + ")"; }).join(", "), status: "active" });
                     localStorage.setItem('my_orders_list', JSON.stringify(savedOrders));
                     
                     document.getElementById('successModal').classList.add('active');
-                    cart = [];
-                    updateCartUI();
-                    saveCart();
+                    cart = []; updateCartUI(); saveCart();
                     if (tg) tg.HapticFeedback.notificationOccurred('success');
-                } else {
-                    alert("Ошибка Telegram: " + data.description);
-                }
-            })
-            .catch(function() { alert("Ошибка сети. Попробуйте позже."); });
+                } else { alert("Ошибка Telegram: " + data.description); }
+            }).catch(function() { alert("Ошибка сети."); });
         }
 
-        function closeSuccessModal() {
-            document.getElementById('successModal').classList.remove('active');
-            switchTab('home', document.getElementById('nav-home')); 
-        }
+        function closeSuccessModal() { document.getElementById('successModal').classList.remove('active'); switchTab('home', document.getElementById('nav-home')); }
 
-        // --- 6. ЛОГИКА ЗАКАЗОВ ---
+        // --- ЗАКАЗЫ ---
         function renderOrders() {
             var container = document.getElementById('orders-list-container');
             var emptyState = document.getElementById('orders-empty');
@@ -795,28 +585,25 @@
                 if (emptyState) emptyState.style.display = 'flex';
             } else {
                 if (emptyState) emptyState.style.display = 'none';
-                
                 savedOrders.forEach(function(order) {
                     var div = document.createElement('div');
-                    div.className = 'price-item';
+                    div.className = 'cart-item';
                     div.style.flexDirection = 'column';
                     div.style.alignItems = 'flex-start';
-                    div.style.gap = '10px';
-                    div.style.cursor = 'default';
                     
                     var statusText = order.status === 'active' ? 'В обработке' : 'Выполнен';
                     var statusColor = order.status === 'active' ? 'var(--neon-light)' : '#00ff64';
                     
                     div.innerHTML = `
-                        <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-                            <h4 style="color:#fff; font-size: 16px;">Заказ #${order.number}</h4>
-                            <span style="color: ${statusColor}; font-size:12px; font-weight:700;">${statusText}</span>
+                        <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+                            <h4 style="color:#fff; font-size: 15px; font-family: 'Unbounded', sans-serif;">Заказ #${order.number}</h4>
+                            <span style="color: ${statusColor}; font-size:11px; font-weight:700;">${statusText}</span>
                         </div>
-                        <p style="color: var(--text-muted); font-size:13px;">${order.items}</p>
+                        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 10px;">${order.items}</p>
                         ${order.status === 'active' ? `
-                        <div style="display:flex; gap:10px; width:100%; margin-top:5px;">
-                            <button onclick="openCompleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(0, 255, 100, 0.1); border:1px solid rgba(0, 255, 100, 0.3); color:#00ff64; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700;">Завершить</button>
-                            <button onclick="openDeleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(255, 0, 85, 0.1); border:1px solid rgba(255, 0, 85, 0.3); color:#ff0055; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700;">Удалить</button>
+                        <div style="display:flex; gap:10px; width:100%;">
+                            <button onclick="openCompleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(0, 255, 100, 0.1); border:1px solid rgba(0, 255, 100, 0.3); color:#00ff64; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700; font-size: 12px;">ЗАВЕРШИТЬ</button>
+                            <button onclick="openDeleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(255, 0, 85, 0.1); border:1px solid rgba(255, 0, 85, 0.3); color:#ff0055; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700; font-size: 12px;">УДАЛИТЬ</button>
                         </div>
                         ` : ''}
                     `;
@@ -829,34 +616,28 @@
 
         function openCompleteModal(id, num) {
             currentAction = { type: 'complete', id: id, num: num };
-            document.getElementById('checkoutConfirmTitle').innerText = 'Подтвердить выполнение #' + num + '?';
+            document.getElementById('checkoutConfirmTitle').innerText = 'Выполнить #' + num + '?';
             document.getElementById('checkoutConfirmModal').classList.add('active');
-            
             var btn = document.querySelector('#checkoutConfirmModal .btn-confirm');
-            btn.innerText = 'Да, завершить';
-            btn.onclick = executeAction;
+            btn.innerText = 'Да'; btn.onclick = executeAction;
         }
 
         function openDeleteModal(id, num) {
             currentAction = { type: 'delete', id: id, num: num };
-            document.getElementById('checkoutConfirmTitle').innerText = 'Удалить заказ #' + num + '?';
+            document.getElementById('checkoutConfirmTitle').innerText = 'Удалить #' + num + '?';
             document.getElementById('checkoutConfirmModal').classList.add('active');
-            
             var btn = document.querySelector('#checkoutConfirmModal .btn-confirm');
-            btn.innerText = 'Да, удалить';
-            btn.onclick = executeAction;
+            btn.innerText = 'Да'; btn.onclick = executeAction;
         }
 
         function executeAction() {
             if (!currentAction) return;
-            
-            // ВСТАВЬ СЮДА НОВЫЙ ТОКЕН
             var BOT_TOKEN = "8955036904:AAEpJcHRPoAV9QxAVMMJGiGGnzjmvZepT20";
             var GROUP_ID = "-1004358524484";
             var url = "https://api.telegram.org/bot" + BOT_TOKEN;
             var savedOrders = JSON.parse(localStorage.getItem('my_orders_list') || '[]');
             
-            function removeFromMemoryAndRender() {
+            function removeAndRender() {
                 savedOrders = savedOrders.filter(function(o) { return o.id !== currentAction.id; });
                 localStorage.setItem('my_orders_list', JSON.stringify(savedOrders));
                 renderOrders();
@@ -867,27 +648,22 @@
             if (currentAction.type === 'complete') {
                 fetch(url + "/editMessageText", {
                     method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        chat_id: GROUP_ID, message_id: parseInt(currentAction.id),
-                        text: `✅ <b>Заказ #${currentAction.num} выполнен!</b>`, parse_mode: "HTML"
-                    })
+                    body: JSON.stringify({ chat_id: GROUP_ID, message_id: parseInt(currentAction.id), text: `✅ <b>Заказ #${currentAction.num} выполнен!</b>`, parse_mode: "HTML" })
                 }).then(res => res.json()).then(data => {
-                    if (!data.ok) alert("Ошибка Telegram: " + data.description);
-                    removeFromMemoryAndRender();
-                }).catch(() => removeFromMemoryAndRender());
-                
+                    if (!data.ok) alert("Telegram: " + data.description);
+                    removeAndRender();
+                }).catch(() => removeAndRender());
             } else if (currentAction.type === 'delete') {
                 fetch(url + "/deleteMessage", {
                     method: "POST", headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ chat_id: GROUP_ID, message_id: parseInt(currentAction.id) })
                 }).then(res => res.json()).then(data => {
-                    if (!data.ok) alert("Ошибка Telegram: " + data.description);
-                    removeFromMemoryAndRender();
-                }).catch(() => removeFromMemoryAndRender());
+                    if (!data.ok) alert("Telegram: " + data.description);
+                    removeAndRender();
+                }).catch(() => removeAndRender());
             }
         }
 
-        // --- 7. ЗАПУСК ---
         loadCart();
     </script>
 </body>
