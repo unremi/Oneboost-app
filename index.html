@@ -6,28 +6,30 @@
     <title>OneBoost</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
         :root {
-            --bg-dark: #06030a;
-            --bg-card: rgba(20, 11, 36, 0.7);
-            --bg-card-hover: rgba(35, 19, 63, 0.9);
-            --neon-purple: #8a2be2;
-            --neon-light: #c7a4ff;
+            --bg-dark: #05020a;
+            --bg-card: rgba(20, 11, 36, 0.6);
+            --bg-card-hover: rgba(35, 19, 63, 0.8);
+            --gradient-primary: linear-gradient(135deg, #7354FF 0%, #43219c 100%);
+            --neon-color: #7354FF;
+            --neon-light: #a893ff;
             --text-main: #ffffff;
             --text-muted: #8c7c9e;
-            --glass-border: rgba(138, 43, 226, 0.25);
-            --glass-border-hover: rgba(199, 164, 255, 0.6);
+            --glass-border: rgba(115, 84, 255, 0.3);
+            --glass-border-hover: rgba(115, 84, 255, 0.7);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body {
             background-color: var(--bg-dark);
+            /* Мягкое свечение на фоне */
             background-image: 
-                radial-gradient(circle at 10% 10%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
-                linear-gradient(180deg, #06030a 0%, #0d0618 100%);
+                radial-gradient(circle at 10% 10%, rgba(115, 84, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(115, 84, 255, 0.1) 0%, transparent 40%),
+                linear-gradient(180deg, #05020a 0%, #0d0618 100%);
             background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
@@ -37,14 +39,12 @@
             position: relative;
         }
 
-        .font-title { font-family: 'Unbounded', sans-serif; }
-
         .svg-icon { width: 24px; height: 24px; stroke: var(--neon-light); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
         .svg-icon-large { width: 32px; height: 32px; stroke: var(--neon-light); stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
         /* --- ПЛАВАЮЩИЕ СИМВОЛЫ НА ФОНЕ --- */
         .bg-symbols { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
-        .bg-symbols svg { position: absolute; stroke: var(--neon-purple); stroke-width: 1.5; fill: none; opacity: 0.1; animation: float 6s ease-in-out infinite; }
+        .bg-symbols svg { position: absolute; stroke: var(--neon-color); stroke-width: 1.5; fill: none; opacity: 0.08; animation: float 6s ease-in-out infinite; }
         .sym-1 { top: 10%; left: 5%; width: 40px; height: 40px; animation-delay: 0s; }
         .sym-2 { top: 25%; right: 10%; width: 60px; height: 60px; animation-delay: 1s; }
         .sym-3 { top: 60%; left: 15%; width: 30px; height: 30px; animation-delay: 2s; }
@@ -55,49 +55,50 @@
 
         /* --- ШАПКА --- */
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px 5px; }
-        .logo { display: flex; align-items: center; font-size: 18px; font-weight: 800; letter-spacing: 1px; font-family: 'Unbounded', sans-serif; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+        .logo { display: flex; align-items: center; font-size: 20px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
         .logo:hover { opacity: 0.8; }
         .logo .one { color: var(--neon-light); }
-        .logo .boost { color: #ffffff; font-weight: 700;}
+        .logo .boost { color: #ffffff; font-weight: 500;}
         
         .support-btn-top { 
             width: 44px; height: 44px; 
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2) 0%, rgba(90, 24, 154, 0.2) 100%);
+            background: rgba(115, 84, 255, 0.1);
             border: 1px solid var(--glass-border); 
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center; 
             cursor: pointer; text-decoration: none;
-            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.2);
+            box-shadow: 0 0 15px rgba(115, 84, 255, 0.1);
             transition: all 0.3s ease;
         }
-        .support-btn-top:hover { background: linear-gradient(135deg, rgba(138, 43, 226, 0.4) 0%, rgba(90, 24, 154, 0.4) 100%); transform: translateY(-2px) scale(1.05); box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4); }
-        .support-btn-top .svg-icon { width: 20px; height: 20px; stroke: var(--neon-light); }
+        .support-btn-top:hover { background: rgba(115, 84, 255, 0.2); transform: translateY(-2px); box-shadow: 0 0 20px rgba(115, 84, 255, 0.3); }
+        .support-btn-top .svg-icon { width: 20px; height: 20px; stroke: #e0d4ff; }
 
         /* --- ПРИВЕТСТВЕННАЯ КАРТОЧКА --- */
         .welcome-card {
-            background: linear-gradient(135deg, rgba(30, 15, 55, 0.8) 0%, rgba(10, 5, 20, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(30, 15, 55, 0.7) 0%, rgba(10, 5, 20, 0.9) 100%);
             backdrop-filter: blur(24px); border: 1px solid var(--glass-border);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6); border-radius: 24px; padding: 25px 20px; margin-bottom: 25px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(115, 84, 255, 0.05); 
+            border-radius: 24px; padding: 25px 20px; margin-bottom: 25px;
             position: relative; overflow: hidden;
         }
-        .welcome-card::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(138, 43, 226, 0.15) 0%, transparent 60%); pointer-events: none; }
-        .welcome-watermark { position: absolute; top: -10px; right: -10px; width: 110px; height: 110px; stroke: rgba(138, 43, 226, 0.1); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(15deg); }
-        .welcome-title { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #ffffff; line-height: 1.4; position: relative; z-index: 1; font-family: 'Unbounded', sans-serif;}
-        .welcome-title span { color: var(--neon-light); font-weight: 800; text-shadow: 0 0 15px rgba(138, 43, 226, 0.5);}
+        .welcome-card::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(115, 84, 255, 0.1) 0%, transparent 60%); pointer-events: none; }
+        .welcome-watermark { position: absolute; top: -10px; right: -10px; width: 110px; height: 110px; stroke: rgba(115, 84, 255, 0.1); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(15deg); }
+        .welcome-title { font-size: 22px; font-weight: 800; margin-bottom: 10px; color: #ffffff; line-height: 1.3; position: relative; z-index: 1;}
+        .welcome-title span { color: var(--neon-light); font-weight: 800; text-shadow: 0 0 15px rgba(115, 84, 255, 0.5);}
         .welcome-desc { font-size: 13px; font-weight: 400; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; position: relative; z-index: 1; max-width: 80%;}
         
         .btn-go-catalog {
-            background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%);
-            color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 14px; border-radius: 14px;
-            font-size: 14px; font-weight: 700; width: 100%; cursor: pointer; transition: all 0.2s; 
+            background: var(--gradient-primary);
+            color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 14px;
+            font-size: 15px; font-weight: 700; width: 100%; cursor: pointer; transition: all 0.2s; 
             position: relative; z-index: 1; display: flex; justify-content: center; align-items: center; gap: 10px;
-            font-family: 'Unbounded', sans-serif;
+            box-shadow: 0 4px 15px rgba(115, 84, 255, 0.3);
         }
-        .btn-go-catalog:hover { background: linear-gradient(180deg, #a964f0 0%, #6a1eb8 100%); transform: translateY(-2px); }
+        .btn-go-catalog:hover { filter: brightness(1.1); transform: translateY(-2px); }
         .btn-go-catalog:active { transform: scale(0.97); }
 
         /* --- СЛАЙДЕР --- */
-        .section-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; color: var(--text-main); text-align: left; font-family: 'Unbounded', sans-serif;}
+        .section-title { font-size: 17px; font-weight: 700; margin-bottom: 15px; color: var(--text-main); text-align: left; }
         
         .slider-wrapper { position: relative; width: 100%; overflow: hidden; margin-bottom: 10px; border-radius: 20px; }
         .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; height: 175px; gap: 15px; padding: 0; }
@@ -111,61 +112,61 @@
             box-shadow: inset 0 0 40px rgba(0,0,0,0.5); scroll-snap-align: center; box-sizing: border-box;
             overflow: hidden; backdrop-filter: blur(10px);
         }
-        .slide-watermark { position: absolute; top: -10px; right: -10px; width: 100px; height: 100px; stroke: rgba(138, 43, 226, 0.12); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(15deg); }
+        .slide-watermark { position: absolute; top: -10px; right: -10px; width: 100px; height: 100px; stroke: rgba(115, 84, 255, 0.12); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(15deg); }
 
-        .badge-hit { position: absolute; top: 15px; right: 15px; background: linear-gradient(90deg, #ff0055, #d1004b); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 0, 85, 0.4); text-transform: uppercase; letter-spacing: 1px; z-index: 2; }
+        .badge-hit { position: absolute; top: 15px; right: 15px; background: linear-gradient(90deg, #ff0055, #d1004b); color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 0, 85, 0.4); text-transform: uppercase; letter-spacing: 1px; z-index: 2; }
         .slide-content { position: relative; z-index: 1; margin-top: 5px; max-width: 85%;}
-        .slide-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 5px; font-family: 'Unbounded', sans-serif;}
-        .slide-desc { font-size: 12px; font-weight: 400; color: var(--text-muted); line-height: 1.4; }
+        .slide-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 5px; }
+        .slide-desc { font-size: 13px; font-weight: 400; color: var(--text-muted); line-height: 1.4; }
         .slide-footer { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; }
-        .slide-price { font-size: 20px; font-weight: 800; color: var(--neon-light); font-family: 'Unbounded', sans-serif;}
+        .slide-price { font-size: 22px; font-weight: 800; color: var(--neon-light); text-shadow: 0 0 10px rgba(115, 84, 255, 0.3);}
         .slide-btn { 
-            background: rgba(138, 43, 226, 0.15); border: 1px solid var(--glass-border); color: #fff; 
-            padding: 8px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
-            transition: background 0.2s;
+            background: rgba(115, 84, 255, 0.15); border: 1px solid var(--glass-border); color: #fff; 
+            padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
         }
-        .slide-btn:hover { background: rgba(138, 43, 226, 0.25); }
+        .slide-btn:hover { background: rgba(115, 84, 255, 0.3); box-shadow: 0 0 15px rgba(115, 84, 255, 0.3); }
 
         .pagination { display: flex; justify-content: center; gap: 6px; margin-bottom: 25px; margin-top: 15px; }
         .dot { width: 18px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; transition: all 0.3s ease; cursor: pointer; }
-        .dot.active { background: var(--neon-purple); width: 28px; box-shadow: 0 0 10px var(--neon-purple); }
+        .dot.active { background: var(--neon-color); width: 28px; box-shadow: 0 0 10px var(--neon-color); }
 
         /* --- ЧАСТЫЕ ВОПРОСЫ --- */
-        .faq-item { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; margin-bottom: 10px; overflow: hidden; transition: all 0.3s ease; }
-        .faq-question { padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 13px; font-weight: 600; color: #fff; font-family: 'Unbounded', sans-serif;}
+        .faq-item { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; margin-bottom: 10px; overflow: hidden; transition: all 0.3s ease; backdrop-filter: blur(10px);}
+        .faq-question { padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 14px; font-weight: 600; color: #fff; }
         .faq-icon { width: 20px; height: 20px; stroke: var(--neon-light); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
-        .faq-answer { padding: 0 16px; max-height: 0; overflow: hidden; color: var(--text-muted); font-size: 12px; line-height: 1.5; transition: all 0.3s ease; }
-        .faq-item.active { background: rgba(35, 19, 63, 0.9); border-color: var(--glass-border-hover); }
+        .faq-answer { padding: 0 16px; max-height: 0; overflow: hidden; color: var(--text-muted); font-size: 13px; line-height: 1.5; transition: all 0.3s ease; }
+        .faq-item.active { background: var(--bg-card-hover); border-color: var(--glass-border-hover); box-shadow: 0 0 20px rgba(115, 84, 255, 0.1);}
         .faq-item.active .faq-icon { transform: rotate(45deg); stroke: #fff; }
         .faq-item.active .faq-answer { padding: 0 16px 16px 16px; max-height: 200px; }
 
         /* Широкая кнопка связи */
         .contact-btn-wide {
             display: flex; align-items: center; justify-content: space-between;
-            background: linear-gradient(90deg, rgba(138, 43, 226, 0.15) 0%, rgba(138, 43, 226, 0.05) 100%);
+            background: linear-gradient(90deg, rgba(115, 84, 255, 0.1) 0%, rgba(115, 84, 255, 0.02) 100%);
             border: 1px solid var(--glass-border);
             border-radius: 20px; padding: 16px 20px; margin-top: 20px;
             text-decoration: none; color: #fff; transition: all 0.2s;
         }
-        .contact-btn-wide:hover { background: linear-gradient(90deg, rgba(138, 43, 226, 0.25) 0%, rgba(138, 43, 226, 0.1) 100%); border-color: var(--glass-border-hover); transform: translateY(-2px); }
+        .contact-btn-wide:hover { background: linear-gradient(90deg, rgba(115, 84, 255, 0.2) 0%, rgba(115, 84, 255, 0.05) 100%); border-color: var(--glass-border-hover); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(115, 84, 255, 0.15);}
         .contact-btn-wide:active { transform: scale(0.98); }
-        .contact-icon-wrap { width: 40px; height: 40px; background: var(--neon-purple); border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-right: 15px; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);}
+        .contact-icon-wrap { width: 40px; height: 40px; background: var(--gradient-primary); border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-right: 15px; box-shadow: 0 0 15px rgba(115, 84, 255, 0.4);}
         .contact-text { flex: 1; }
-        .contact-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; font-family: 'Unbounded', sans-serif;}
-        .contact-desc { font-size: 11px; color: var(--text-muted); }
+        .contact-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+        .contact-desc { font-size: 12px; color: var(--text-muted); }
 
         /* --- КАТАЛОГ --- */
         .catalog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .game-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; position: relative; display: flex; flex-direction: column; min-height: 150px; overflow: hidden; justify-content: space-between; backdrop-filter: blur(10px); cursor: pointer; transition: transform 0.2s, background 0.2s; }
-        .game-card:hover { background: var(--bg-card-hover); }
+        .game-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; position: relative; display: flex; flex-direction: column; min-height: 150px; overflow: hidden; justify-content: space-between; backdrop-filter: blur(10px); cursor: pointer; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; }
+        .game-card:hover { background: var(--bg-card-hover); box-shadow: 0 0 20px rgba(115, 84, 255, 0.15); border-color: var(--glass-border-hover);}
         .game-card:active { transform: scale(0.96); }
-        .card-purple { background: linear-gradient(180deg, rgba(35, 19, 63, 0.8) 0%, rgba(10, 5, 20, 0.9) 100%); border-color: rgba(138, 43, 226, 0.3); }
-        .card-dark { background: linear-gradient(180deg, rgba(20, 11, 36, 0.8) 0%, rgba(10, 5, 20, 0.9) 100%); border-color: rgba(255,255,255,0.08); }
-        .watermark { position: absolute; right: -20px; bottom: -20px; width: 120px; height: 120px; stroke: rgba(138, 43, 226, 0.12); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(-15deg); }
+        .card-purple { background: linear-gradient(180deg, rgba(35, 19, 63, 0.7) 0%, rgba(10, 5, 20, 0.9) 100%); border-color: rgba(115, 84, 255, 0.3); }
+        .card-dark { background: linear-gradient(180deg, rgba(20, 11, 36, 0.7) 0%, rgba(10, 5, 20, 0.9) 100%); border-color: rgba(255,255,255,0.08); }
+        .watermark { position: absolute; right: -20px; bottom: -20px; width: 120px; height: 120px; stroke: rgba(115, 84, 255, 0.12); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(-15deg); }
         .card-content { position: relative; z-index: 1; }
         .card-icon-wrap { margin-bottom: 10px; }
-        .card-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; font-family: 'Unbounded', sans-serif;}
-        .card-sub { font-size: 11px; font-weight: 400; color: var(--text-muted); }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .card-sub { font-size: 12px; font-weight: 400; color: var(--text-muted); }
 
         /* --- ПРАЙС-ЛИСТ --- */
         .price-view { display: none; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -175,26 +176,25 @@
         .catalog-initial.hidden { display: none; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .back-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 12px; color: var(--neon-light); font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
-        .back-btn:hover { background: rgba(255,255,255,0.1); }
-        .price-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; color: #fff; text-align: center; font-family: 'Unbounded', sans-serif;}
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(115, 84, 255, 0.1); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 12px; color: var(--neon-light); font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
+        .back-btn:hover { background: rgba(115, 84, 255, 0.2); }
+        .price-title { font-size: 23px; font-weight: 800; margin-bottom: 20px; color: #fff; text-align: center; text-shadow: 0 0 15px rgba(115, 84, 255, 0.3); }
         .price-list-container { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; margin-bottom: 20px; backdrop-filter: blur(10px); }
-        .price-header { display: flex; justify-content: space-between; padding: 0 10px 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-family: 'Unbounded', sans-serif;}
+        .price-header { display: flex; justify-content: space-between; padding: 0 10px 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
         .price-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .price-item { background: rgba(138, 43, 226, 0.05); border: 1px solid rgba(138, 43, 226, 0.15); border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; width: 48%; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-family: 'Unbounded', sans-serif;}
-        .price-item:hover { background: rgba(138, 43, 226, 0.15); }
-        .price-item:active { background: rgba(138, 43, 226, 0.2); }
-        .price-item span { color: #fff; font-weight: 800; }
-        .price-item .coins { color: var(--neon-light); font-size: 12px; font-weight: 700;}
+        .price-item { background: rgba(115, 84, 255, 0.05); border: 1px solid rgba(115, 84, 255, 0.15); border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; width: 48%; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .price-item:hover { background: rgba(115, 84, 255, 0.15); border-color: var(--glass-border-hover); box-shadow: 0 0 15px rgba(115, 84, 255, 0.2);}
+        .price-item:active { background: rgba(115, 84, 255, 0.25); }
+        .price-item span { color: #f0e6ff; font-weight: 800; }
+        .price-item .coins { color: var(--neon-light); font-size: 13px; font-weight: 700;}
 
         .btn-custom-amount {
             display: flex; justify-content: center; align-items: center; gap: 10px;
-            background: rgba(138, 43, 226, 0.1); border: 1px solid var(--glass-border);
-            color: var(--text-main); padding: 16px; border-radius: 14px; font-size: 14px; font-weight: 700;
-            width: 100%; cursor: pointer; margin-top: 15px; margin-bottom: 25px; transition: background 0.2s;
-            font-family: 'Unbounded', sans-serif;
+            background: rgba(115, 84, 255, 0.1); border: 1px solid var(--glass-border);
+            color: var(--text-main); padding: 16px; border-radius: 14px; font-size: 15px; font-weight: 700;
+            width: 100%; cursor: pointer; margin-top: 15px; margin-bottom: 25px; transition: all 0.2s;
         }
-        .btn-custom-amount:hover { background: rgba(138, 43, 226, 0.2); }
+        .btn-custom-amount:hover { background: rgba(115, 84, 255, 0.2); border-color: var(--glass-border-hover); box-shadow: 0 0 20px rgba(115, 84, 255, 0.15);}
 
         /* --- ПОЛНОЭКРАННАЯ КАРТА --- */
         .fullscreen-map { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #05020a; z-index: 500; display: none; flex-direction: column; overflow: hidden; opacity: 0; }
@@ -207,25 +207,25 @@
         .map-close-btn:hover { background: rgba(255,255,255,0.2); }
         .map-close-btn:active { transform: scale(0.9); }
 
-        .map-title-fullscreen { position: absolute; top: 30px; left: 20px; font-size: 22px; font-weight: 800; color: var(--text-main); z-index: 10; font-family: 'Unbounded', sans-serif;}
+        .map-title-fullscreen { position: absolute; top: 30px; left: 20px; font-size: 22px; font-weight: 800; color: var(--text-main); z-index: 10; text-shadow: 0 2px 10px rgba(0,0,0,0.8); letter-spacing: 1px;}
 
-        .map-point { position: absolute; width: 22px; height: 22px; background: rgba(138, 43, 226, 0.3); border: 2px solid var(--neon-light); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transform: translate(-50%, -50%); box-shadow: 0 0 20px rgba(138, 43, 226, 0.8), 0 0 40px rgba(138, 43, 226, 0.4); transition: all 0.3s ease; z-index: 5; animation: pulsePoint 2s infinite; }
-        @keyframes pulsePoint { 0% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.5); } 50% { box-shadow: 0 0 30px rgba(138, 43, 226, 1), 0 0 60px rgba(138, 43, 226, 0.6); } 100% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.5); } }
+        .map-point { position: absolute; width: 22px; height: 22px; background: rgba(115, 84, 255, 0.3); border: 2px solid var(--neon-light); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transform: translate(-50%, -50%); box-shadow: 0 0 20px rgba(115, 84, 255, 0.8), 0 0 40px rgba(115, 84, 255, 0.4); transition: all 0.3s ease; z-index: 5; animation: pulsePoint 2s infinite; }
+        @keyframes pulsePoint { 0% { box-shadow: 0 0 10px rgba(115, 84, 255, 0.5); } 50% { box-shadow: 0 0 30px rgba(115, 84, 255, 1), 0 0 60px rgba(115, 84, 255, 0.6); } 100% { box-shadow: 0 0 10px rgba(115, 84, 255, 0.5); } }
         .map-point::after { content: ''; width: 8px; height: 8px; background: #fff; border-radius: 50%; }
-        .map-point:hover { transform: translate(-50%, -50%) scale(1.5); background: rgba(138, 43, 226, 0.7); }
-        .map-point-label { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 12px; font-weight: 700; color: #fff; pointer-events: none; background: rgba(10, 3, 20, 0.9); padding: 4px 12px; border-radius: 8px; border: 1px solid var(--glass-border); font-family: 'Unbounded', sans-serif;}
+        .map-point:hover { transform: translate(-50%, -50%) scale(1.5); background: rgba(115, 84, 255, 0.7); }
+        .map-point-label { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 13px; font-weight: 700; color: #fff; text-shadow: 0 0 8px #000, 0 0 15px #000; pointer-events: none; background: rgba(10, 3, 20, 0.8); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(115, 84, 255, 0.5); }
 
         /* --- НИЖНЕЕ МЕНЮ --- */
-        .bottom-nav { position: fixed; bottom: 15px; left: 15px; right: 15px; background: rgba(15, 5, 30, 0.9); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 10px 8px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6b5b8e; font-size: 9px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 60px; position: relative;}
+        .bottom-nav { position: fixed; bottom: 15px; left: 15px; right: 15px; background: rgba(15, 5, 30, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); display: flex; justify-content: space-around; padding: 8px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #6b5b8e; font-size: 10px; font-weight: 600; cursor: pointer; transition: 0.3s; width: 60px; position: relative;}
         .nav-icon-wrap { width: 44px; height: 36px; display: flex; justify-content: center; align-items: center; border-radius: 14px; transition: 0.3s; }
         .nav-item .svg-icon { stroke: #6b5b8e; transition: 0.3s; }
         .nav-item:hover { color: #a89bce; }
         .nav-item.active { color: #fff; }
-        .nav-item.active .nav-icon-wrap { background: rgba(138, 43, 226, 0.2); box-shadow: inset 0 0 10px rgba(138, 43, 226, 0.3); }
-        .nav-item.active .svg-icon { stroke: var(--neon-light); filter: drop-shadow(0 0 5px rgba(138,43,226,0.6)); }
+        .nav-item.active .nav-icon-wrap { background: rgba(115, 84, 255, 0.2); border: 1px solid rgba(115, 84, 255, 0.3); box-shadow: inset 0 0 10px rgba(115, 84, 255, 0.2); }
+        .nav-item.active .svg-icon { stroke: var(--neon-light); filter: drop-shadow(0 0 5px rgba(115,84,255,0.6)); }
 
-        .cart-badge { position: absolute; top: -2px; right: 5px; background: #ff0055; color: white; font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 9px; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(255, 0, 85, 0.6); display: none; }
+        .cart-badge { position: absolute; top: 0; right: 10px; background: #ff0055; color: white; font-size: 10px; font-weight: bold; min-width: 16px; height: 16px; border-radius: 8px; display: flex; justify-content: center; align-items: center; padding: 0 4px; box-shadow: 0 0 10px rgba(255, 0, 85, 0.6); display: none; }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
@@ -234,18 +234,20 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 600; }
         .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
         
-        .modal-content { background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.9); position: relative; }
+        .modal-content { background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(115, 84, 255, 0.1); position: relative; }
         
-        .modal-icon { width: 50px; height: 50px; stroke: var(--neon-light); stroke-width: 1.5; fill: none; margin-bottom: 15px; }
-        .modal-title { font-size: 16px; font-weight: 800; margin-bottom: 20px; color: #fff; line-height: 1.3; font-family: 'Unbounded', sans-serif;}
+        .modal-icon { width: 50px; height: 50px; stroke: var(--neon-light); stroke-width: 1.5; fill: none; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(115, 84, 255, 0.5)); }
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #fff; line-height: 1.3;}
         
-        .modal-input { width: 100%; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--glass-border); color: #fff; padding: 15px; border-radius: 12px; font-size: 16px; text-align: center; margin-bottom: 20px; outline: none; font-weight: 700; font-family: 'Unbounded', sans-serif;}
-        .modal-input:focus { border-color: var(--neon-light); box-shadow: 0 0 10px rgba(138, 43, 226, 0.3); }
+        .modal-input { width: 100%; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--glass-border); color: #fff; padding: 15px; border-radius: 12px; font-size: 18px; text-align: center; margin-bottom: 20px; outline: none; font-weight: 600; transition: border 0.2s; }
+        .modal-input:focus { border-color: var(--neon-light); box-shadow: 0 0 10px rgba(115, 84, 255, 0.3); }
         
         .modal-actions { display: flex; gap: 10px; }
-        .modal-btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; font-family: 'Unbounded', sans-serif;}
-        .btn-cancel { background: rgba(255,255,255,0.1); color: var(--text-muted); }
-        .btn-confirm { background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%); color: #fff; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3); }
+        .modal-btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: transform 0.1s;}
+        .modal-btn:hover { opacity: 0.9; }
+        .modal-btn:active { transform: scale(0.95); }
+        .btn-cancel { background: rgba(255,255,255,0.08); color: var(--text-muted); }
+        .btn-confirm { background: var(--gradient-primary); color: #fff; box-shadow: 0 4px 15px rgba(115, 84, 255, 0.3); }
 
         /* --- КОРЗИНА --- */
         .cart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 20px; text-align: center; }
@@ -253,32 +255,36 @@
         .cart-empty p { color: var(--text-muted); font-size: 15px; }
 
         .cart-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px; margin-bottom: 10px; backdrop-filter: blur(10px); }
-        .cart-item-info h4 { font-size: 14px; color: #fff; margin-bottom: 4px; font-family: 'Unbounded', sans-serif;}
+        .cart-item-info h4 { font-size: 15px; color: #fff; margin-bottom: 4px; }
         .cart-item-info p { font-size: 13px; color: var(--neon-light); font-weight: 600; }
         .btn-delete-item { background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); color: #ff0055; padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
         .btn-delete-item:hover { background: rgba(255, 0, 85, 0.2); }
 
-        .btn-checkout { background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%); color: #fff; border: none; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4); font-family: 'Unbounded', sans-serif;}
+        .btn-checkout { background: var(--gradient-primary); color: #fff; border: none; padding: 16px; border-radius: 16px; font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 20px rgba(115, 84, 255, 0.4); transition: transform 0.1s; }
+        .btn-checkout:hover { transform: translateY(-2px); }
+        .btn-checkout:active { transform: scale(0.97); }
 
         /* --- КРАСИВОЕ УВЕДОМЛЕНИЕ --- */
         .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 700; }
         .success-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
         
-        .success-box { background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%); border: 1px solid var(--glass-border); border-radius: 30px; padding: 35px 30px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.9); position: relative; }
+        .success-box { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 30px; padding: 35px 30px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(115, 84, 255, 0.15); position: relative; }
 
-        .checkmark-container { width: 70px; height: 70px; margin: 0 auto 20px; position: relative; }
-        .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon-purple); fill: none; animation: stroke 0.6s forwards; }
-        .checkmark-bg { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon-purple); fill: rgba(138, 43, 226, 0.1); animation: stroke 0.6s forwards; }
+        .checkmark-container { width: 80px; height: 80px; margin: 0 auto 20px; position: relative; }
+        .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon-color); fill: none; animation: stroke 0.6s forwards; }
+        .checkmark-bg { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon-color); fill: rgba(115, 84, 255, 0.1); animation: stroke 0.6s forwards; }
         .checkmark-check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; stroke-width: 4; stroke: var(--neon-light); fill: none; animation: stroke 0.3s 0.6s forwards; }
         @keyframes stroke { 100% { stroke-dashoffset: 0; } }
 
-        .success-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 10px; font-family: 'Unbounded', sans-serif;}
-        .success-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; }
+        .success-title { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 10px; }
+        .success-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; }
         
-        .btn-close-success { background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border); color: #fff; padding: 14px 20px; border-radius: 14px; font-size: 14px; font-weight: 700; width: 100%; cursor: pointer; font-family: 'Unbounded', sans-serif;}
+        .btn-close-success { background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border); color: #fff; padding: 14px 20px; border-radius: 14px; font-size: 15px; font-weight: 700; width: 100%; cursor: pointer; transition: background 0.2s; }
+        .btn-close-success:hover { background: rgba(255, 255, 255, 0.2); }
+        .btn-close-success:active { background: rgba(255, 255, 255, 0.3); }
 
         /* --- TOAST УВЕДОМЛЕНИЕ --- */
-        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(30, 15, 60, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--neon-purple); border-radius: 12px; padding: 12px 20px; color: #fff; font-size: 14px; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 800; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(30, 15, 60, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px 20px; color: #fff; font-size: 14px; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 800; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 10px; white-space: nowrap; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
     </style>
 </head>
@@ -518,7 +524,7 @@
         <h2 class="section-title">Мои заказы (из приложения)</h2>
         <div id="orders-list-container"></div>
         <div id="orders-empty" class="cart-empty" style="display: none;">
-            <svg class="svg-icon-large" viewBox="0 0 24 24" style="width: 50px; height: 50px; margin-bottom: 20px; stroke: #c7a4ff;">
+            <svg class="svg-icon-large" viewBox="0 0 24 24" style="width: 50px; height: 50px; margin-bottom: 20px; stroke: #7354FF;">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
                 <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -654,8 +660,8 @@
         if (tg) {
             tg.ready();
             tg.expand();
-            if (tg.setHeaderColor) tg.setHeaderColor('#06030a');
-            if (tg.setBackgroundColor) tg.setBackgroundColor('#06030a');
+            if (tg.setHeaderColor) tg.setHeaderColor('#05020a');
+            if (tg.setBackgroundColor) tg.setBackgroundColor('#05020a');
             
             var user = tg.initDataUnsafe.user;
             if (user) {
@@ -1011,18 +1017,18 @@
                     div.style.gap = '10px';
                     
                     var statusText = order.status === 'active' ? 'В обработке' : 'Выполнен';
-                    var statusColor = order.status === 'active' ? 'var(--neon-light)' : '#00ff64';
+                    var statusColor = order.status === 'active' ? '#a893ff' : '#00ff64';
                     
                     div.innerHTML = `
                         <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-                            <h4 style="color:#fff; font-family: 'Unbounded', sans-serif;">Заказ #${order.number}</h4>
+                            <h4 style="color:#fff;">Заказ #${order.number}</h4>
                             <span style="color: ${statusColor}; font-size:12px; font-weight: 700;">${statusText}</span>
                         </div>
-                        <p style="color: var(--text-muted); font-size:13px;">${order.items}</p>
+                        <p style="color: #8c7c9e; font-size:13px;">${order.items}</p>
                         ${order.status === 'active' ? `
                         <div style="display:flex; gap:10px; width:100%; margin-top:5px;">
-                            <button onclick="openCompleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(0, 255, 100, 0.1); border:1px solid rgba(0, 255, 100, 0.3); color:#00ff64; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700; font-size: 12px; font-family: 'Unbounded', sans-serif;">ЗАВЕРШИТЬ</button>
-                            <button onclick="openDeleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(255, 0, 85, 0.1); border:1px solid rgba(255, 0, 85, 0.3); color:#ff0055; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700; font-size: 12px; font-family: 'Unbounded', sans-serif;">УДАЛИТЬ</button>
+                            <button onclick="openCompleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(0, 255, 100, 0.1); border:1px solid rgba(0, 255, 100, 0.3); color:#00ff64; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700; font-size: 12px;">ЗАВЕРШИТЬ</button>
+                            <button onclick="openDeleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(255, 0, 85, 0.1); border:1px solid rgba(255, 0, 85, 0.3); color:#ff0055; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700; font-size: 12px;">УДАЛИТЬ</button>
                         </div>
                         ` : ''}
                     `;
