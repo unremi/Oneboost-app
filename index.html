@@ -17,13 +17,13 @@
             --text-main: #ffffff;
             --text-muted: #8c7c9e;
             --glass-border: rgba(138, 43, 226, 0.25);
+            --glass-border-hover: rgba(199, 164, 255, 0.6);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body {
             background-color: var(--bg-dark);
-            /* Градиентный фон как на фото */
             background-image: 
                 radial-gradient(circle at 10% 10%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
                 radial-gradient(circle at 90% 90%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
@@ -34,430 +34,564 @@
             padding: 20px;
             padding-bottom: 110px;
             overflow-x: hidden;
+            position: relative;
         }
 
         .font-title { font-family: 'Unbounded', sans-serif; }
 
         .svg-icon { width: 24px; height: 24px; stroke: var(--neon-light); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
+        .svg-icon-large { width: 32px; height: 32px; stroke: var(--neon-light); stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* --- ПЛАВАЮЩИЕ СИМВОЛЫ НА ФОНЕ --- */
+        .bg-symbols { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
+        .bg-symbols svg { position: absolute; stroke: var(--neon-purple); stroke-width: 1.5; fill: none; opacity: 0.1; animation: float 6s ease-in-out infinite; }
+        .sym-1 { top: 10%; left: 5%; width: 40px; height: 40px; animation-delay: 0s; }
+        .sym-2 { top: 25%; right: 10%; width: 60px; height: 60px; animation-delay: 1s; }
+        .sym-3 { top: 60%; left: 15%; width: 30px; height: 30px; animation-delay: 2s; }
+        .sym-4 { top: 80%; right: 5%; width: 50px; height: 50px; animation-delay: 0.5s; }
+        .sym-5 { top: 45%; left: 80%; width: 35px; height: 35px; animation-delay: 1.5s; }
+        .sym-6 { top: 15%; left: 60%; width: 25px; height: 25px; animation-delay: 2.5s; }
+        @keyframes float { 0% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-15px) rotate(10deg); } 100% { transform: translateY(0px) rotate(0deg); } }
 
         /* --- ШАПКА --- */
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px 5px; }
-        .logo { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; letter-spacing: 1px; font-family: 'Unbounded', sans-serif; text-transform: uppercase; cursor: pointer;}
-        .logo svg { width: 24px; height: 24px; stroke: var(--neon-light); }
+        .logo { display: flex; align-items: center; font-size: 18px; font-weight: 800; letter-spacing: 1px; font-family: 'Unbounded', sans-serif; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+        .logo:hover { opacity: 0.8; }
+        .logo .one { color: var(--neon-light); }
+        .logo .boost { color: #ffffff; font-weight: 700;}
         
         .support-btn-top { 
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(138, 43, 226, 0.1); border: 1px solid var(--glass-border); 
-            padding: 8px 14px; border-radius: 20px; text-decoration: none; color: var(--text-main);
-            font-size: 11px; font-weight: 600; transition: all 0.3s;
+            width: 44px; height: 44px; 
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2) 0%, rgba(90, 24, 154, 0.2) 100%);
+            border: 1px solid var(--glass-border); 
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; 
+            cursor: pointer; text-decoration: none;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.2);
+            transition: all 0.3s ease;
         }
-        .support-btn-top svg { width: 14px; height: 14px; stroke: var(--neon-light); }
+        .support-btn-top:hover { background: linear-gradient(135deg, rgba(138, 43, 226, 0.4) 0%, rgba(90, 24, 154, 0.4) 100%); transform: translateY(-2px) scale(1.05); box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4); }
+        .support-btn-top .svg-icon { width: 20px; height: 20px; stroke: var(--neon-light); }
 
         /* --- ПРИВЕТСТВЕННАЯ КАРТОЧКА --- */
         .welcome-card {
             background: linear-gradient(135deg, rgba(30, 15, 55, 0.8) 0%, rgba(10, 5, 20, 0.9) 100%);
-            border: 1px solid var(--glass-border); border-radius: 24px; 
-            padding: 25px 20px; margin-bottom: 25px;
+            backdrop-filter: blur(24px); border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6); border-radius: 24px; padding: 25px 20px; margin-bottom: 25px;
             position: relative; overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .welcome-card::before { 
-            content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; 
-            background: radial-gradient(circle, rgba(138, 43, 226, 0.3) 0%, transparent 70%); 
-            border-radius: 50%; pointer-events: none;
-        }
+        .welcome-card::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(138, 43, 226, 0.15) 0%, transparent 60%); pointer-events: none; }
+        .welcome-watermark { position: absolute; top: -10px; right: -10px; width: 110px; height: 110px; stroke: rgba(138, 43, 226, 0.1); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(15deg); }
+        .welcome-title { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #ffffff; line-height: 1.4; position: relative; z-index: 1; font-family: 'Unbounded', sans-serif;}
+        .welcome-title span { color: var(--neon-light); font-weight: 800; text-shadow: 0 0 15px rgba(138, 43, 226, 0.5);}
+        .welcome-desc { font-size: 13px; font-weight: 400; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; position: relative; z-index: 1; max-width: 80%;}
         
-        .welcome-title { font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; font-family: 'Unbounded', sans-serif;}
-        .welcome-title span { color: var(--neon-light); text-shadow: 0 0 15px rgba(138, 43, 226, 0.5); }
-        .welcome-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
-        
-        .btn-primary {
+        .btn-go-catalog {
             background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%);
-            color: #fff; border: none; padding: 15px; border-radius: 16px;
-            font-size: 14px; font-weight: 700; width: 100%; cursor: pointer;
-            box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4); transition: transform 0.2s;
+            color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 14px; border-radius: 14px;
+            font-size: 14px; font-weight: 700; width: 100%; cursor: pointer; transition: all 0.2s; 
+            position: relative; z-index: 1; display: flex; justify-content: center; align-items: center; gap: 10px;
             font-family: 'Unbounded', sans-serif;
         }
-        .btn-primary:active { transform: scale(0.97); }
+        .btn-go-catalog:hover { background: linear-gradient(180deg, #a964f0 0%, #6a1eb8 100%); transform: translateY(-2px); }
+        .btn-go-catalog:active { transform: scale(0.97); }
 
         /* --- СЛАЙДЕР --- */
-        .section-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; font-family: 'Unbounded', sans-serif; letter-spacing: 0.5px;}
+        .section-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; color: var(--text-main); text-align: left; font-family: 'Unbounded', sans-serif;}
         
-        .slider-wrapper { width: 100%; overflow: hidden; margin-bottom: 25px; border-radius: 20px; }
-        .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 15px; padding-bottom: 5px; }
+        .slider-wrapper { position: relative; width: 100%; overflow: hidden; margin-bottom: 10px; border-radius: 20px; }
+        .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; height: 175px; gap: 15px; padding: 0; }
         .slider-container::-webkit-scrollbar { display: none; }
         
         .slide-card {
-            min-width: 100%; background: var(--bg-card); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 20px; scroll-snap-align: center;
-            display: flex; flex-direction: column; justify-content: space-between;
-            backdrop-filter: blur(10px);
+            min-width: 100%; 
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px;
+            display: flex; flex-direction: column; justify-content: space-between; position: relative;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5); scroll-snap-align: center; box-sizing: border-box;
+            overflow: hidden; backdrop-filter: blur(10px);
         }
-        .slide-title { font-size: 18px; font-weight: 800; margin-bottom: 5px; font-family: 'Unbounded', sans-serif;}
-        .slide-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px; }
-        .slide-footer { display: flex; justify-content: space-between; align-items: flex-end; }
-        .slide-price { font-size: 20px; font-weight: 800; color: var(--neon-light); font-family: 'Unbounded', sans-serif;}
-        .btn-buy {
-            background: rgba(138, 43, 226, 0.15); border: 1px solid var(--glass-border); color: #fff;
-            padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
-            transition: all 0.2s;
-        }
+        .slide-watermark { position: absolute; top: -10px; right: -10px; width: 100px; height: 100px; stroke: rgba(138, 43, 226, 0.12); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(15deg); }
 
-        .pagination { display: flex; justify-content: center; gap: 6px; margin-bottom: 25px; }
-        .dot { width: 18px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; transition: 0.3s; }
+        .badge-hit { position: absolute; top: 15px; right: 15px; background: linear-gradient(90deg, #ff0055, #d1004b); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 0, 85, 0.4); text-transform: uppercase; letter-spacing: 1px; z-index: 2; }
+        .slide-content { position: relative; z-index: 1; margin-top: 5px; max-width: 85%;}
+        .slide-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 5px; font-family: 'Unbounded', sans-serif;}
+        .slide-desc { font-size: 12px; font-weight: 400; color: var(--text-muted); line-height: 1.4; }
+        .slide-footer { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; }
+        .slide-price { font-size: 20px; font-weight: 800; color: var(--neon-light); font-family: 'Unbounded', sans-serif;}
+        .slide-btn { 
+            background: rgba(138, 43, 226, 0.15); border: 1px solid var(--glass-border); color: #fff; 
+            padding: 8px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .slide-btn:hover { background: rgba(138, 43, 226, 0.25); }
+
+        .pagination { display: flex; justify-content: center; gap: 6px; margin-bottom: 25px; margin-top: 15px; }
+        .dot { width: 18px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; transition: all 0.3s ease; cursor: pointer; }
         .dot.active { background: var(--neon-purple); width: 28px; box-shadow: 0 0 10px var(--neon-purple); }
 
-        /* --- ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ (В КАТАЛОГЕ) --- */
-        .currency-switcher {
-            display: flex; background: rgba(20, 11, 36, 0.8); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 4px; margin-bottom: 20px;
+        /* --- ЧАСТЫЕ ВОПРОСЫ --- */
+        .faq-item { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; margin-bottom: 10px; overflow: hidden; transition: all 0.3s ease; }
+        .faq-question { padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 13px; font-weight: 600; color: #fff; font-family: 'Unbounded', sans-serif;}
+        .faq-icon { width: 20px; height: 20px; stroke: var(--neon-light); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
+        .faq-answer { padding: 0 16px; max-height: 0; overflow: hidden; color: var(--text-muted); font-size: 12px; line-height: 1.5; transition: all 0.3s ease; }
+        .faq-item.active { background: rgba(35, 19, 63, 0.9); border-color: var(--glass-border-hover); }
+        .faq-item.active .faq-icon { transform: rotate(45deg); stroke: #fff; }
+        .faq-item.active .faq-answer { padding: 0 16px 16px 16px; max-height: 200px; }
+
+        /* Широкая кнопка связи */
+        .contact-btn-wide {
+            display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(90deg, rgba(138, 43, 226, 0.15) 0%, rgba(138, 43, 226, 0.05) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 16px 20px; margin-top: 20px;
+            text-decoration: none; color: #fff; transition: all 0.2s;
         }
-        .currency-btn {
-            flex: 1; padding: 10px; border-radius: 12px; border: none; background: transparent;
-            color: var(--text-muted); font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.3s;
-            font-family: 'Unbounded', sans-serif;
-        }
-        .currency-btn.active {
-            background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
-            color: #fff; box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
-            border: 1px solid rgba(138, 43, 226, 0.3);
-        }
+        .contact-btn-wide:hover { background: linear-gradient(90deg, rgba(138, 43, 226, 0.25) 0%, rgba(138, 43, 226, 0.1) 100%); border-color: var(--glass-border-hover); transform: translateY(-2px); }
+        .contact-btn-wide:active { transform: scale(0.98); }
+        .contact-icon-wrap { width: 40px; height: 40px; background: var(--neon-purple); border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-right: 15px; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);}
+        .contact-text { flex: 1; }
+        .contact-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; font-family: 'Unbounded', sans-serif;}
+        .contact-desc { font-size: 11px; color: var(--text-muted); }
 
         /* --- КАТАЛОГ --- */
-        .price-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-        .price-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-card); border: 1px solid var(--glass-border);
-            padding: 15px 20px; border-radius: 16px; backdrop-filter: blur(10px);
-            cursor: pointer; transition: all 0.2s;
-        }
-        .price-item:active { transform: scale(0.98); }
-        .price-left { display: flex; align-items: center; gap: 12px; }
-        .price-coin-icon { width: 32px; height: 32px; background: rgba(138, 43, 226, 0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--neon-light); font-weight: 800; font-size: 12px; font-family: 'Unbounded', sans-serif;}
-        .price-amount { font-size: 16px; font-weight: 800; color: var(--text-main); font-family: 'Unbounded', sans-serif;}
-        .price-millions { font-size: 14px; font-weight: 600; color: var(--text-muted); }
+        .catalog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .game-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; position: relative; display: flex; flex-direction: column; min-height: 150px; overflow: hidden; justify-content: space-between; backdrop-filter: blur(10px); cursor: pointer; transition: transform 0.2s, background 0.2s; }
+        .game-card:hover { background: var(--bg-card-hover); }
+        .game-card:active { transform: scale(0.96); }
+        .card-purple { background: linear-gradient(180deg, rgba(35, 19, 63, 0.8) 0%, rgba(10, 5, 20, 0.9) 100%); border-color: rgba(138, 43, 226, 0.3); }
+        .card-dark { background: linear-gradient(180deg, rgba(20, 11, 36, 0.8) 0%, rgba(10, 5, 20, 0.9) 100%); border-color: rgba(255,255,255,0.08); }
+        .watermark { position: absolute; right: -20px; bottom: -20px; width: 120px; height: 120px; stroke: rgba(138, 43, 226, 0.12); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(-15deg); }
+        .card-content { position: relative; z-index: 1; }
+        .card-icon-wrap { margin-bottom: 10px; }
+        .card-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; font-family: 'Unbounded', sans-serif;}
+        .card-sub { font-size: 11px; font-weight: 400; color: var(--text-muted); }
 
-        /* --- ПРЕИМУЩЕСТВА --- */
-        .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
-        .feature-card {
-            background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px;
-            padding: 15px 10px; text-align: center; backdrop-filter: blur(10px);
-        }
-        .feature-icon { margin-bottom: 8px; }
-        .feature-icon svg { width: 24px; height: 24px; stroke: var(--neon-light); }
-        .feature-text { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+        /* --- ПРАЙС-ЛИСТ --- */
+        .price-view { display: none; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .price-view.active { display: block; }
+        @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+        .catalog-initial { animation: fadeIn 0.4s ease; }
+        .catalog-initial.hidden { display: none; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- КНОПКА СВЯЗИ --- */
-        .contact-btn-wide {
-            display: flex; align-items: center; gap: 15px;
-            background: linear-gradient(90deg, rgba(138, 43, 226, 0.15) 0%, rgba(138, 43, 226, 0.05) 100%);
-            border: 1px solid var(--glass-border); border-radius: 50px; padding: 10px 20px 10px 10px;
-            text-decoration: none; color: #fff; transition: all 0.2s; margin-bottom: 20px;
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 12px; color: var(--neon-light); font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; }
+        .back-btn:hover { background: rgba(255,255,255,0.1); }
+        .price-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; color: #fff; text-align: center; font-family: 'Unbounded', sans-serif;}
+        .price-list-container { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; margin-bottom: 20px; backdrop-filter: blur(10px); }
+        .price-header { display: flex; justify-content: space-between; padding: 0 10px 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-family: 'Unbounded', sans-serif;}
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .price-item { background: rgba(138, 43, 226, 0.05); border: 1px solid rgba(138, 43, 226, 0.15); border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; width: 48%; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-family: 'Unbounded', sans-serif;}
+        .price-item:hover { background: rgba(138, 43, 226, 0.15); }
+        .price-item:active { background: rgba(138, 43, 226, 0.2); }
+        .price-item span { color: #fff; font-weight: 800; }
+        .price-item .coins { color: var(--neon-light); font-size: 12px; font-weight: 700;}
+
+        .btn-custom-amount {
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            background: rgba(138, 43, 226, 0.1); border: 1px solid var(--glass-border);
+            color: var(--text-main); padding: 16px; border-radius: 14px; font-size: 14px; font-weight: 700;
+            width: 100%; cursor: pointer; margin-top: 15px; margin-bottom: 25px; transition: background 0.2s;
+            font-family: 'Unbounded', sans-serif;
         }
-        .contact-icon-wrap { width: 40px; height: 40px; background: var(--neon-purple); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5); }
-        .contact-icon-wrap svg { width: 20px; height: 20px; stroke: #fff; margin-left: -2px; }
-        .contact-text { flex: 1; }
-        .contact-title { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
-        .contact-desc { font-size: 14px; font-weight: 700; color: #fff; font-family: 'Unbounded', sans-serif;}
+        .btn-custom-amount:hover { background: rgba(138, 43, 226, 0.2); }
+
+        /* --- ПОЛНОЭКРАННАЯ КАРТА --- */
+        .fullscreen-map { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #05020a; z-index: 500; display: none; flex-direction: column; overflow: hidden; opacity: 0; }
+        .fullscreen-map.active { display: flex; animation: mapFadeIn 1s ease forwards; }
+        @keyframes mapFadeIn { 0% { opacity: 0; filter: blur(20px) brightness(2); } 100% { opacity: 1; filter: blur(0) brightness(1); } }
+
+        .map-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #0c0516; background-image: radial-gradient(ellipse at 20% 80%, rgba(30, 10, 60, 0.8) 0%, transparent 40%), radial-gradient(ellipse at 80% 20%, rgba(30, 10, 60, 0.8) 0%, transparent 40%), radial-gradient(circle at 50% 50%, rgba(40, 15, 80, 0.6) 0%, transparent 30%), radial-gradient(circle at 70% 70%, rgba(90, 24, 154, 0.4) 0%, transparent 20%), radial-gradient(circle at 30% 30%, rgba(90, 24, 154, 0.4) 0%, transparent 25%), radial-gradient(circle at 40% 80%, rgba(70, 25, 120, 0.3) 0%, transparent 15%), radial-gradient(circle at 60% 40%, rgba(70, 25, 120, 0.3) 0%, transparent 20%), url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"); background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100px 100px; z-index: 1; box-shadow: inset 0 0 200px rgba(0,0,0,0.9); }
+
+        .map-close-btn { position: absolute; top: 20px; right: 20px; width: 44px; height: 44px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 24px; cursor: pointer; z-index: 10; backdrop-filter: blur(10px); transition: background 0.2s; }
+        .map-close-btn:hover { background: rgba(255,255,255,0.2); }
+        .map-close-btn:active { transform: scale(0.9); }
+
+        .map-title-fullscreen { position: absolute; top: 30px; left: 20px; font-size: 22px; font-weight: 800; color: var(--text-main); z-index: 10; font-family: 'Unbounded', sans-serif;}
+
+        .map-point { position: absolute; width: 22px; height: 22px; background: rgba(138, 43, 226, 0.3); border: 2px solid var(--neon-light); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transform: translate(-50%, -50%); box-shadow: 0 0 20px rgba(138, 43, 226, 0.8), 0 0 40px rgba(138, 43, 226, 0.4); transition: all 0.3s ease; z-index: 5; animation: pulsePoint 2s infinite; }
+        @keyframes pulsePoint { 0% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.5); } 50% { box-shadow: 0 0 30px rgba(138, 43, 226, 1), 0 0 60px rgba(138, 43, 226, 0.6); } 100% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.5); } }
+        .map-point::after { content: ''; width: 8px; height: 8px; background: #fff; border-radius: 50%; }
+        .map-point:hover { transform: translate(-50%, -50%) scale(1.5); background: rgba(138, 43, 226, 0.7); }
+        .map-point-label { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 12px; font-weight: 700; color: #fff; pointer-events: none; background: rgba(10, 3, 20, 0.9); padding: 4px 12px; border-radius: 8px; border: 1px solid var(--glass-border); font-family: 'Unbounded', sans-serif;}
 
         /* --- НИЖНЕЕ МЕНЮ --- */
-        .bottom-nav { 
-            position: fixed; bottom: 15px; left: 15px; right: 15px; 
-            background: rgba(15, 5, 30, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            display: flex; justify-content: space-around; padding: 10px 8px; border-radius: 30px; 
-            border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 100;
-        }
+        .bottom-nav { position: fixed; bottom: 15px; left: 15px; right: 15px; background: rgba(15, 5, 30, 0.9); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 10px 8px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 100; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6b5b8e; font-size: 9px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 60px; position: relative;}
         .nav-icon-wrap { width: 44px; height: 36px; display: flex; justify-content: center; align-items: center; border-radius: 14px; transition: 0.3s; }
-        .nav-item svg { width: 22px; height: 22px; stroke: #6b5b8e; transition: 0.3s; }
+        .nav-item .svg-icon { stroke: #6b5b8e; transition: 0.3s; }
+        .nav-item:hover { color: #a89bce; }
         .nav-item.active { color: #fff; }
         .nav-item.active .nav-icon-wrap { background: rgba(138, 43, 226, 0.2); box-shadow: inset 0 0 10px rgba(138, 43, 226, 0.3); }
-        .nav-item.active svg { stroke: var(--neon-light); filter: drop-shadow(0 0 5px rgba(138,43,226,0.6)); }
+        .nav-item.active .svg-icon { stroke: var(--neon-light); filter: drop-shadow(0 0 5px rgba(138,43,226,0.6)); }
 
-        .cart-badge {
-            position: absolute; top: -2px; right: 5px; background: #ff0055; color: white; font-size: 10px; font-weight: 800;
-            min-width: 18px; height: 18px; border-radius: 9px; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 0 10px rgba(255, 0, 85, 0.6); display: none;
-        }
+        .cart-badge { position: absolute; top: -2px; right: 5px; background: #ff0055; color: white; font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 9px; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(255, 0, 85, 0.6); display: none; }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- МОДАЛЬНЫЕ ОКНА --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
-            display: none; justify-content: center; align-items: center; z-index: 600;
-        }
-        .modal-overlay.active { display: flex; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 600; }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
         
-        .modal-content {
-            background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
-            border: 1px solid var(--glass-border); border-radius: 24px;
-            padding: 25px; width: 90%; max-width: 340px; text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
-        }
+        .modal-content { background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.9); position: relative; }
         
-        .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #fff; font-family: 'Unbounded', sans-serif;}
+        .modal-icon { width: 50px; height: 50px; stroke: var(--neon-light); stroke-width: 1.5; fill: none; margin-bottom: 15px; }
+        .modal-title { font-size: 16px; font-weight: 800; margin-bottom: 20px; color: #fff; line-height: 1.3; font-family: 'Unbounded', sans-serif;}
         
-        .modal-input {
-            width: 100%; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--glass-border);
-            color: #fff; padding: 15px; border-radius: 12px; font-size: 18px; text-align: center;
-            margin-bottom: 20px; outline: none; font-weight: 600; font-family: 'Unbounded', sans-serif;
-        }
+        .modal-input { width: 100%; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--glass-border); color: #fff; padding: 15px; border-radius: 12px; font-size: 16px; text-align: center; margin-bottom: 20px; outline: none; font-weight: 700; font-family: 'Unbounded', sans-serif;}
+        .modal-input:focus { border-color: var(--neon-light); box-shadow: 0 0 10px rgba(138, 43, 226, 0.3); }
         
         .modal-actions { display: flex; gap: 10px; }
-        .modal-btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; font-family: 'Unbounded', sans-serif;}
+        .modal-btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; font-family: 'Unbounded', sans-serif;}
         .btn-cancel { background: rgba(255,255,255,0.1); color: var(--text-muted); }
         .btn-confirm { background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%); color: #fff; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3); }
 
         /* --- КОРЗИНА --- */
-        .cart-empty { display: flex; flex-direction: column; align-items: center; padding: 50px 20px; text-align: center; }
-        .cart-empty svg { width: 60px; height: 60px; stroke: var(--text-muted); margin-bottom: 15px; opacity: 0.5; }
-        .cart-empty p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+        .cart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 20px; text-align: center; }
+        .cart-empty svg { width: 60px; height: 60px; stroke: var(--text-muted); margin-bottom: 15px; }
+        .cart-empty p { color: var(--text-muted); font-size: 15px; }
 
-        .cart-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-card); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 15px; margin-bottom: 10px;
-        }
-        .cart-item-info h4 { font-size: 15px; color: #fff; margin-bottom: 4px; font-weight: 700; font-family: 'Unbounded', sans-serif;}
+        .cart-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px; margin-bottom: 10px; backdrop-filter: blur(10px); }
+        .cart-item-info h4 { font-size: 14px; color: #fff; margin-bottom: 4px; font-family: 'Unbounded', sans-serif;}
         .cart-item-info p { font-size: 13px; color: var(--neon-light); font-weight: 600; }
-        .btn-delete-item {
-            background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3);
-            color: #ff0055; padding: 8px; border-radius: 10px; cursor: pointer;
-        }
-        .btn-delete-item svg { width: 18px; height: 18px; stroke: currentColor; }
+        .btn-delete-item { background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); color: #ff0055; padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+        .btn-delete-item:hover { background: rgba(255, 0, 85, 0.2); }
 
-        .btn-checkout {
-            background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%);
-            color: #fff; border: none; padding: 16px; border-radius: 16px;
-            font-size: 15px; font-weight: 800; width: 100%; cursor: pointer;
-            margin-top: 20px; box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4);
-            font-family: 'Unbounded', sans-serif;
-        }
+        .btn-checkout { background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%); color: #fff; border: none; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4); font-family: 'Unbounded', sans-serif;}
 
         /* --- КРАСИВОЕ УВЕДОМЛЕНИЕ --- */
-        .success-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px);
-            display: none; justify-content: center; align-items: center; z-index: 700;
-        }
-        .success-overlay.active { display: flex; }
+        .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 700; }
+        .success-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
         
-        .success-box {
-            background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
-            border: 1px solid var(--glass-border); border-radius: 30px;
-            padding: 30px 20px; width: 90%; max-width: 320px; text-align: center;
-        }
+        .success-box { background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%); border: 1px solid var(--glass-border); border-radius: 30px; padding: 35px 30px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.9); position: relative; }
 
         .checkmark-container { width: 70px; height: 70px; margin: 0 auto 20px; position: relative; }
         .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon-purple); fill: none; animation: stroke 0.6s forwards; }
+        .checkmark-bg { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon-purple); fill: rgba(138, 43, 226, 0.1); animation: stroke 0.6s forwards; }
         .checkmark-check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; stroke-width: 4; stroke: var(--neon-light); fill: none; animation: stroke 0.3s 0.6s forwards; }
         @keyframes stroke { 100% { stroke-dashoffset: 0; } }
 
         .success-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 10px; font-family: 'Unbounded', sans-serif;}
-        .success-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
+        .success-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; }
+        
+        .btn-close-success { background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border); color: #fff; padding: 14px 20px; border-radius: 14px; font-size: 14px; font-weight: 700; width: 100%; cursor: pointer; font-family: 'Unbounded', sans-serif;}
+
+        /* --- TOAST УВЕДОМЛЕНИЕ --- */
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(30, 15, 60, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--neon-purple); border-radius: 12px; padding: 12px 20px; color: #fff; font-size: 14px; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 800; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
     </style>
 </head>
 <body>
 
+    <!-- ЖИВОЙ ФОН -->
+    <div class="bg-symbols">
+        <svg class="sym-1" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <svg class="sym-2" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
+        <svg class="sym-3" viewBox="0 0 24 24"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"></path></svg>
+        <svg class="sym-4" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <svg class="sym-5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <svg class="sym-6" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+    </div>
+
     <!-- ШАПКА -->
     <div class="top-bar">
         <div class="logo" onclick="switchTab('home', document.getElementById('nav-home'))">
-            <svg viewBox="0 0 24 24"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"></path></svg>
-            <span>ONEBOOST</span>
+            <span class="one">ONE</span><span class="boost">BOOST</span>
         </div>
-        <a href="https://t.me/Oneboostmanager" target="_blank" class="support-btn-top">
-            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-            24/7
+        <a href="https://t.me/Oneboostmanager" target="_blank" class="support-btn-top" title="Написать менеджеру">
+            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </a>
     </div>
 
     <!-- ВКЛАДКА: ГЛАВНАЯ -->
     <div id="tab-home" class="tab-content active">
-        
-        <div class="welcome-card">
-            <div class="welcome-title">ПРИВЕТСТВУЕМ В <br><span>ONEBOOST!</span></div>
-            <div class="welcome-desc">Твой надежный проводник в мир Arena Breakout. Быстро, безопасно и с гарантией.</div>
-            <button class="btn-primary" onclick="switchTab('catalog', document.getElementById('nav-catalog'))">
-                ПЕРЕЙТИ В КАТАЛОГ
+        <div id="home-main-content">
+            <div class="welcome-card">
+                <svg class="welcome-watermark" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <div class="welcome-title">Приветствуем в <br><span>ONEBOOST!</span></div>
+                <div class="welcome-desc">Твой надежный проводник в мир Arena Breakout. Быстро, безопасно и с гарантией.</div>
+                <button class="btn-go-catalog" onclick="switchTab('catalog', document.getElementById('nav-catalog'))">
+                    <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    Перейти в каталог
+                </button>
+            </div>
+
+            <h3 class="section-title">Хиты продаж</h3>
+            <div class="slider-wrapper">
+                <div class="slider-container" id="slider">
+                    <div class="slide-card">
+                        <svg class="slide-watermark" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
+                        <div class="badge-hit">ХИТ</div>
+                        <div class="slide-content">
+                            <div class="slide-title">Буст 10 млн</div>
+                            <div class="slide-desc">Мгновенный фарм коинов. Наши топ-игроки выполнят заказ в кратчайшие сроки.</div>
+                        </div>
+                        <div class="slide-footer">
+                            <div class="slide-price">1 950 ₽</div>
+                            <button class="slide-btn" onclick="addToCart('Буст', '10 млн')">Заказать</button>
+                        </div>
+                    </div>
+                    <div class="slide-card">
+                        <svg class="slide-watermark" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
+                        <div class="badge-hit">ХИТ</div>
+                        <div class="slide-content">
+                            <div class="slide-title">Сопровождение 5 млн</div>
+                            <div class="slide-desc">Играем в одной команде. Приносим вам лучший лут без вашего участия.</div>
+                        </div>
+                        <div class="slide-footer">
+                            <div class="slide-price">1000 ₽</div>
+                            <button class="slide-btn" onclick="addToCart('Сопровождение', '5 млн')">Заказать</button>
+                        </div>
+                    </div>
+                    <div class="slide-card">
+                        <svg class="slide-watermark" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
+                        <div class="slide-content">
+                            <div class="slide-title">Буст 50 млн</div>
+                            <div class="slide-desc">Максимальный результат. Заберем все самое ценное с локаций.</div>
+                        </div>
+                        <div class="slide-footer">
+                            <div class="slide-price">9 200 ₽</div>
+                            <button class="slide-btn" onclick="addToCart('Буст', '50 млн')">Заказать</button>
+                        </div>
+                    </div>
+                    <div class="slide-card">
+                        <svg class="slide-watermark" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>
+                        <div class="slide-content">
+                            <div class="slide-title">Запретная зона</div>
+                            <div class="slide-desc">1 игра на Ферме 1+1. Гарант выноса от 8М коинов за 2 игры.</div>
+                        </div>
+                        <div class="slide-footer">
+                            <div class="slide-price">2 759 ₽</div>
+                            <button class="slide-btn" onclick="addToCart('Рейд (Ферма)', '1 игра')">Заказать</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <div class="dot active" onclick="goToSlide(0)"></div>
+                <div class="dot" onclick="goToSlide(1)"></div>
+                <div class="dot" onclick="goToSlide(2)"></div>
+                <div class="dot" onclick="goToSlide(3)"></div>
+            </div>
+
+            <h3 class="section-title">Частые вопросы</h3>
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Нужен ли пароль от аккаунта?
+                    <svg class="faq-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </div>
+                <div class="faq-answer">
+                    Для услуги «Буст» — да, потребуются данные для входа. Мы гарантируем полную конфиденциальность. Для «Сопровождения» пароль не требуется, вы играете сами.
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Когда исполнитель получает деньги?
+                    <svg class="faq-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </div>
+                <div class="faq-answer">
+                    Только после того, как вы полностью подтвердите выполнение заказа. Ваши средства защищены до момента сдачи работы.
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Какое время выполнения заказов?
+                    <svg class="faq-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </div>
+                <div class="faq-answer">
+                    Время напрямую зависит от объема вашего заказа. Чем больше коинов или игр вам нужно, тем больше времени это займет. Мы всегда стараемся выполнять работу максимально быстро.
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Что, если исполнитель пропал?
+                    <svg class="faq-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </div>
+                <div class="faq-answer">
+                    Обратитесь в поддержку. Мы оперативно рассмотрим ситуацию, заменим исполнителя или вернем средства. Ваш комфорт — наш приоритет.
+                </div>
+            </div>
+
+            <a href="https://t.me/Oneboostmanager" target="_blank" class="contact-btn-wide">
+                <div class="contact-icon-wrap">
+                    <svg class="svg-icon" viewBox="0 0 24 24" style="stroke: #fff;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </div>
+                <div class="contact-text">
+                    <div class="contact-title">Остались вопросы?</div>
+                    <div class="contact-desc">Напишите нам, мы поможем</div>
+                </div>
+                <div class="arrow">›</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- ВКЛАДКА: КАТАЛОГ -->
+    <div id="tab-catalog" class="tab-content">
+        <!-- Стартовый экран каталога -->
+        <div id="catalog-start" class="catalog-initial">
+            <h2 class="section-title">Выберите категорию</h2>
+            <div class="catalog-grid" style="grid-template-columns: 1fr; gap: 15px;">
+                <div class="game-card card-purple" style="min-height: 100px; flex-direction: row; align-items: center; justify-content: space-between; padding: 20px;" onclick="showPrice('boost')">
+                    <div class="card-content" style="display: flex; align-items: center; gap: 15px;">
+                        <div class="card-icon-wrap" style="margin: 0;">
+                            <svg class="svg-icon-large" viewBox="0 0 24 24" style="width: 40px; height: 40px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        </div>
+                        <div><div class="card-title" style="font-size: 18px; font-weight: 700;">Буст</div><div class="card-sub">Быстрое выполнение заказов</div></div>
+                    </div>
+                    <div class="arrow" style="font-size: 28px;">›</div>
+                </div>
+                <div class="game-card card-dark" style="min-height: 100px; flex-direction: row; align-items: center; justify-content: space-between; padding: 20px;" onclick="showPrice('coop')">
+                    <div class="card-content" style="display: flex; align-items: center; gap: 15px;">
+                        <div class="card-icon-wrap" style="margin: 0;"><svg class="svg-icon-large" viewBox="0 0 24 24" style="width: 40px; height: 40px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                        <div><div class="card-title" style="font-size: 18px; font-weight: 700;">Сопровождение</div><div class="card-sub">Играем в одной команде</div></div>
+                    </div>
+                    <div class="arrow" style="font-size: 28px;">›</div>
+                </div>
+                <!-- Кнопка КАРТЫ -->
+                <div class="game-card card-dark" style="min-height: 100px; flex-direction: row; align-items: center; justify-content: space-between; padding: 20px;" onclick="openFullScreenMap()">
+                    <div class="card-content" style="display: flex; align-items: center; gap: 15px;">
+                        <div class="card-icon-wrap" style="margin: 0;">
+                            <svg class="svg-icon-large" viewBox="0 0 24 24" style="width: 40px; height: 40px;"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                        </div>
+                        <div><div class="card-title" style="font-size: 18px; font-weight: 700;">Сопровождение по картам</div><div class="card-sub">Выбери конкретную локацию</div></div>
+                    </div>
+                    <div class="arrow" style="font-size: 28px;">›</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ПРАЙС БУСТ -->
+        <div id="price-boost" class="price-view">
+            <div class="back-btn" onclick="closePrice()">← Назад в каталог</div>
+            <div class="price-title">Прайс: Буст</div>
+            <div class="price-list-container">
+                <div class="price-header"><div>Цена (₽)</div><div>Миллионов</div></div>
+                <div class="price-row"><div class="price-item" onclick="addToCart('Буст', '5 млн')">1100 ₽ <span class="coins">5M</span></div><div class="price-item" onclick="addToCart('Буст', '50 млн')">9200 ₽ <span class="coins">50M</span></div></div>
+                <div class="price-row"><div class="price-item" onclick="addToCart('Буст', '10 млн')">1950 ₽ <span class="coins">10M</span></div><div class="price-item" onclick="addToCart('Буст', '60 млн')">10900 ₽ <span class="coins">60M</span></div></div>
+                <div class="price-row"><div class="price-item" onclick="addToCart('Буст', '20 млн')">3800 ₽ <span class="coins">20M</span></div><div class="price-item" onclick="addToCart('Буст', '70 млн')">12600 ₽ <span class="coins">70M</span></div></div>
+                <div class="price-row"><div class="price-item" onclick="addToCart('Буст', '30 млн')">5650 ₽ <span class="coins">30M</span></div><div class="price-item" onclick="addToCart('Буст', '80 млн')">14000 ₽ <span class="coins">80M</span></div></div>
+                <div class="price-row"><div class="price-item" onclick="addToCart('Буст', '40 млн')">7400 ₽ <span class="coins">40M</span></div><div class="price-item" onclick="addToCart('Буст', '90 млн')">15700 ₽ <span class="coins">90M</span></div></div>
+                <div class="price-row" style="justify-content: center;"><div class="price-item" style="width: 100%; justify-content: center; gap: 10px;" onclick="addToCart('Буст', '100 млн')">17000 ₽ <span class="coins">100M</span></div></div>
+            </div>
+            <button class="btn-custom-amount" onclick="openModal('Буст')">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                Мне нужно другое количество
             </button>
         </div>
 
-        <div class="section-title">ХИТЫ ПРОДАЖ</div>
-        <div class="slider-wrapper">
-            <div class="slider-container" id="slider">
-                <div class="slide-card">
-                    <div>
-                        <div class="slide-title">Буст 10 млн</div>
-                        <div class="slide-desc">Мгновенный фарм коинов. Наши топ-игроки выполнят заказ в кратчайшие сроки.</div>
-                    </div>
-                    <div class="slide-footer">
-                        <div class="slide-price">2 200 ₽</div>
-                        <button class="btn-buy" onclick="addToCart('Буст', '10 млн', 2200)">Заказать</button>
-                    </div>
-                </div>
-                <div class="slide-card">
-                    <div>
-                        <div class="slide-title">Сопровождение 5 млн</div>
-                        <div class="slide-desc">Играем в одной команде. Приносим вам лучший лут без вашего участия.</div>
-                    </div>
-                    <div class="slide-footer">
-                        <div class="slide-price">1 300 ₽</div>
-                        <button class="btn-buy" onclick="addToCart('Сопровождение', '5 млн', 1300)">Заказать</button>
-                    </div>
-                </div>
+        <!-- ПРАЙС СОПРОВОЖДЕНИЕ -->
+        <div id="price-coop" class="price-view">
+            <div class="back-btn" onclick="closePrice()">← Назад в каталог</div>
+            <div class="price-title">Прайс: Сопровождение</div>
+            <div class="price-list-container">
+                <div class="price-header"><div>Цена (₽)</div><div>Миллионов</div></div>
+                <div class="price-row"><div class="price-item" onclick="addToCart('Сопровождение', '5 млн')">1000 ₽ <span class="coins">5M</span></div><div class="price-item" onclick="addToCart('Сопровождение', '50 млн')">9500 ₽ <span class="coins">50M</span></div></div>
+                <div class="price-row"><div class="price-item" onclick="addToCart('Сопровождение', '10 млн')">1800 ₽ <span class="coins">10M</span></div><div class="price-item" onclick="addToCart('Сопровождение', '60 млн')">11500 ₽ <span class="coins">60M</span></div></div>
+                <div class="price-row"><div class="price-item" onclick="addToCart('Сопровождение', '20 млн')">3500 ₽ <span class="coins">20M</span></div><div class="price-item" onclick="addToCart('Сопровождение', '70 млн')">13000 ₽ <span class="coins">70M</span></div></div>
+                <div class="price-row"><div class="price-item" onclick="addToCart('Сопровождение', '30 млн')">5200 ₽ <span class="coins">30M</span></div><div class="price-item" onclick="addToCart('Сопровождение', '80 млн')">14500 ₽ <span class="coins">80M</span></div></div>
+                <div class="price-row"><div class="price-item" onclick="addToCart('Сопровождение', '40 млн')">7000 ₽ <span class="coins">40M</span></div><div class="price-item" onclick="addToCart('Сопровождение', '90 млн')">16000 ₽ <span class="coins">90M</span></div></div>
+                <div class="price-row" style="justify-content: center;"><div class="price-item" style="width: 100%; justify-content: center; gap: 10px;" onclick="addToCart('Сопровождение', '100 млн')">17500 ₽ <span class="coins">100M</span></div></div>
             </div>
+            <button class="btn-custom-amount" onclick="openModal('Сопровождение')">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                Мне нужно другое количество
+            </button>
         </div>
-        <div class="pagination" id="pagination">
-            <div class="dot active"></div>
-            <div class="dot"></div>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
-                <div class="feature-text">Мгновенная<br>доставка</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-                <div class="feature-text">Гарантия<br>безопасности</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg></div>
-                <div class="feature-text">Поддержка<br>24/7</div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
-                <div class="feature-text">Только<br>проверенные</div>
-            </div>
-        </div>
-
-        <a href="https://t.me/Oneboostmanager" target="_blank" class="contact-btn-wide">
-            <div class="contact-icon-wrap">
-                <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-            </div>
-            <div class="contact-text">
-                <div class="contact-title">НАПИШИ В TELEGRAM</div>
-                <div class="contact-desc">ПОЛУЧИ БУСТ СЕЙЧАС</div>
-            </div>
-        </a>
-    </div>
-
-    <!-- ВКЛАДКА: КАТАЛОГ (ПРАЙС) -->
-    <div id="tab-catalog" class="tab-content">
-        <div class="section-title" style="text-align: center; margin-bottom: 20px;">ПРАЙС ЛИСТ</div>
-        
-        <!-- ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ -->
-        <div class="currency-switcher">
-            <button class="currency-btn active" onclick="changeCurrency('rub', this)">₽ RUB</button>
-            <button class="currency-btn" onclick="changeCurrency('uah', this)">₴ UAH</button>
-            <button class="currency-btn" onclick="changeCurrency('usd', this)">$ USD</button>
-        </div>
-
-        <div class="price-list">
-            <div class="price-item" onclick="addToCart('Буст', '5 млн', 1300)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="1 300 ₽" data-uah="720 ₴" data-usd="$15">1 300 ₽</div></div>
-                <div class="price-millions">5M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '10 млн', 2200)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="2 200 ₽" data-uah="1 210 ₴" data-usd="$27">2 200 ₽</div></div>
-                <div class="price-millions">10M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '20 млн', 4400)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="4 400 ₽" data-uah="2 430 ₴" data-usd="$53">4 400 ₽</div></div>
-                <div class="price-millions">20M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '30 млн', 6500)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="6 500 ₽" data-uah="3 590 ₴" data-usd="$79">6 500 ₽</div></div>
-                <div class="price-millions">30M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '40 млн', 8500)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="8 500 ₽" data-uah="4 690 ₴" data-usd="$103">8 500 ₽</div></div>
-                <div class="price-millions">40M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '50 млн', 10600)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="10 600 ₽" data-uah="5 860 ₴" data-usd="$129">10 600 ₽</div></div>
-                <div class="price-millions">50M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '60 млн', 12500)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="12 500 ₽" data-uah="6 910 ₴" data-usd="$152">12 500 ₽</div></div>
-                <div class="price-millions">60M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '70 млн', 14500)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="14 500 ₽" data-uah="8 010 ₴" data-usd="$176">14 500 ₽</div></div>
-                <div class="price-millions">70M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '80 млн', 16100)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="16 100 ₽" data-uah="8 900 ₴" data-usd="$195">16 100 ₽</div></div>
-                <div class="price-millions">80M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '90 млн', 18100)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="18 100 ₽" data-uah="10 000 ₴" data-usd="$220">18 100 ₽</div></div>
-                <div class="price-millions">90M</div>
-            </div>
-            <div class="price-item" onclick="addToCart('Буст', '100 млн', 19600)">
-                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="19 600 ₽" data-uah="10 830 ₴" data-usd="$238">19 600 ₽</div></div>
-                <div class="price-millions">100M</div>
-            </div>
-        </div>
-
-        <button class="btn-primary" style="margin-bottom: 25px;" onclick="openModal('Буст')">
-            ДРУГОЕ КОЛИЧЕСТВО
-        </button>
     </div>
 
     <!-- ВКЛАДКА: КОРЗИНА -->
     <div id="tab-cart" class="tab-content">
-        <div class="section-title" style="text-align: center; margin-bottom: 20px;">КОРЗИНА</div>
+        <h2 class="section-title">Корзина</h2>
         <div id="cart-items-container"></div>
         <div id="cart-empty-state" class="cart-empty">
             <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             <p>Ваша корзина пуста</p>
         </div>
-        <button id="checkout-btn" class="btn-checkout" style="display: none;" onclick="openCheckoutConfirm()">ОФОРМИТЬ ЗАКАЗ</button>
+        
+        <button id="checkout-btn" class="btn-checkout" style="display: none;" onclick="openCheckoutConfirm()">Оформить заказ</button>
     </div>
 
     <!-- ВКЛАДКА: ЗАКАЗЫ -->
     <div id="tab-orders" class="tab-content">
-        <div class="section-title" style="text-align: center; margin-bottom: 20px;">МОИ ЗАКАЗЫ</div>
+        <h2 class="section-title">Мои заказы (из приложения)</h2>
         <div id="orders-list-container"></div>
         <div id="orders-empty" class="cart-empty" style="display: none;">
-            <svg viewBox="0 0 24 24" fill="none" style="stroke: var(--neon-purple);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-            <p style="color: #fff; font-weight: 700; margin-bottom: 10px;">У вас пока нет заказов</p>
-            <p style="font-size: 13px;">Заказы, сделанные через кнопки в боте, смотрите в самом боте.</p>
+            <svg class="svg-icon-large" viewBox="0 0 24 24" style="width: 50px; height: 50px; margin-bottom: 20px; stroke: #c7a4ff;">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <p style="font-size: 15px; color: #eae4f5;">У вас пока нет заказов из приложения</p>
+            <p style="font-size: 13px; color: #b0a3c9; margin-top: 10px;">Заказы, сделанные через кнопки в боте, смотрите в разделе «Мои заказы» в самом боте.</p>
         </div>
     </div>
 
     <!-- НИЖНЕЕ МЕНЮ -->
     <div class="bottom-nav">
         <div class="nav-item active" id="nav-home" onclick="switchTab('home', this)">
-            <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
+            <div class="nav-icon-wrap"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
             <div>Главная</div>
         </div>
         <div class="nav-item" id="nav-catalog" onclick="switchTab('catalog', this)">
-            <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
-            <div>Прайс</div>
+            <div class="nav-icon-wrap"><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+            <div>Каталог</div>
         </div>
         <div class="nav-item" id="nav-cart" onclick="switchTab('cart', this)">
             <div class="nav-icon-wrap">
-                <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                 <div class="cart-badge" id="cart-badge">0</div>
             </div>
             <div>Корзина</div>
         </div>
         <div class="nav-item" id="nav-orders" onclick="switchTab('orders', this)">
-            <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></div>
+            <div class="nav-icon-wrap"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></div>
             <div>Заказы</div>
         </div>
     </div>
 
-    <!-- МОДАЛЬНЫЕ ОКНА -->
-    <div class="modal-overlay" id="customModal">
+    <!-- ПОЛНОЭКРАННАЯ КАРТА -->
+    <div class="fullscreen-map" id="fullscreenMap">
+        <div class="map-background"></div>
+        
+        <div class="map-title-fullscreen">Выберите карту</div>
+        <div class="map-close-btn" onclick="closeFullScreenMap()">✕</div>
+
+        <div class="map-point" style="top: 75%; left: 25%;" onclick="openMapPoint('Ферма', 'Запретная зона', 350)">
+            <div class="map-point-label">Ферма</div>
+        </div>
+        <div class="map-point" style="top: 25%; left: 65%;" onclick="openMapPoint('Нортридж', 'Зона блокады', 350)">
+            <div class="map-point-label">Нортридж</div>
+        </div>
+        <div class="map-point" style="top: 55%; left: 45%;" onclick="openMapPoint('Арсенал', 'Запретная зона', 350)">
+            <div class="map-point-label">Арсенал</div>
+        </div>
+        <div class="map-point" style="top: 40%; left: 80%;" onclick="openMapPoint('Телецентр', 'Запретная зона', 350)">
+            <div class="map-point-label">Телецентр</div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: Выбор точки на карте -->
+    <div class="modal-overlay" id="mapModal">
         <div class="modal-content">
-            <div class="modal-title">Введите количество</div>
+            <svg class="modal-icon" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+            <div class="modal-title" id="mapModalTitle">Название карты</div>
+            <div style="font-size: 15px; color: #c7a4ff; font-weight: 700; margin-bottom: 5px;" id="mapModalPrice">350 ₽</div>
+            <div style="font-size: 12px; color: #b0a3c9; margin-bottom: 20px;">Гарантированный вынос от 1.5 млн коинов</div>
+            <div class="modal-actions">
+                <button class="modal-btn btn-cancel" onclick="closeMapModal()">Отмена</button>
+                <button class="modal-btn btn-confirm" onclick="confirmMapPoint()">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: Свое количество -->
+    <div class="modal-overlay" id="customModal" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content">
+            <svg class="modal-icon" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <div class="modal-title" id="modalTitle">Введите количество миллионов</div>
             <input type="number" id="customAmountInput" class="modal-input" placeholder="Например: 15" min="1">
             <div class="modal-actions">
                 <button class="modal-btn btn-cancel" onclick="closeModal()">Отмена</button>
@@ -466,62 +600,82 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО: Добавить в корзину? -->
     <div class="modal-overlay" id="confirmAddModal">
         <div class="modal-content">
+            <svg class="modal-icon" viewBox="0 0 24 24" style="stroke: #fff;"><path d="M20 6L9 17l-5-5"></path></svg>
             <div class="modal-title" id="confirmAddTitle">Добавить в корзину?</div>
             <div class="modal-actions">
                 <button class="modal-btn btn-cancel" onclick="cancelAdd()">Отмена</button>
-                <button class="modal-btn btn-confirm" onclick="confirmAdd()">Да</button>
+                <button class="modal-btn btn-confirm" onclick="confirmAdd()">Да, добавить</button>
             </div>
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО: Подтверждение оформления -->
     <div class="modal-overlay" id="checkoutConfirmModal">
         <div class="modal-content">
+            <svg class="modal-icon" viewBox="0 0 24 24" style="stroke: #ff0055;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
             <div class="modal-title" id="checkoutConfirmTitle">Оформить заказ?</div>
             <div class="modal-actions">
                 <button class="modal-btn btn-cancel" onclick="closeCheckoutConfirm()">Отмена</button>
-                <button class="modal-btn btn-confirm" onclick="confirmCheckout()">Да</button>
+                <button class="modal-btn btn-confirm" onclick="confirmCheckout()">Да, оформить</button>
             </div>
         </div>
     </div>
 
+    <!-- КРАСИВОЕ УВЕДОМЛЕНИЕ ОБ УСПЕХЕ -->
     <div class="success-overlay" id="successModal">
         <div class="success-box">
             <div class="checkmark-container">
                 <svg viewBox="0 0 52 52">
+                    <circle class="checkmark-bg" cx="26" cy="26" r="25" />
                     <circle class="checkmark-circle" cx="26" cy="26" r="25" />
                     <path class="checkmark-check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
                 </svg>
             </div>
+            
             <div class="success-title">Заказ оформлен!</div>
-            <div class="success-desc">Менеджер свяжется с вами в ближайшее время для уточнения деталей.</div>
-            <button class="btn-primary" onclick="closeSuccessModal()">Закрыть</button>
+            <div class="success-desc">Для оплаты и уточнения деталей менеджер свяжется с вами в ближайшее время.</div>
+            
+            <button class="btn-close-success" onclick="closeSuccessModal()">Закрыть</button>
         </div>
     </div>
 
+    <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ (TOAST) -->
+    <div class="toast" id="toast">
+        <svg class="svg-icon" style="width: 18px; height: 18px; stroke: #fff;" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
+        <span id="toastText">Товар добавлен в корзину</span>
+    </div>
+
     <script>
+        // --- 1. ЗАЩИТА И БАЗОВАЯ ИНИЦИАЛИЗАЦИЯ ---
         var tg = window.Telegram ? window.Telegram.WebApp : null;
         if (tg) {
             tg.ready();
             tg.expand();
             if (tg.setHeaderColor) tg.setHeaderColor('#06030a');
             if (tg.setBackgroundColor) tg.setBackgroundColor('#06030a');
-        }
-
-        // --- ВАЛЮТА ---
-        function changeCurrency(currency, btn) {
-            document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
             
-            document.querySelectorAll('.price-val').forEach(function(el) {
-                if (currency === 'rub') el.innerText = el.getAttribute('data-rub');
-                if (currency === 'uah') el.innerText = el.getAttribute('data-uah');
-                if (currency === 'usd') el.innerText = el.getAttribute('data-usd');
-            });
+            var user = tg.initDataUnsafe.user;
+            if (user) {
+                var titleEl = document.querySelector('.welcome-title');
+                if (titleEl) titleEl.innerHTML = 'Приветствуем, <br><span>' + user.first_name + '!</span>';
+            }
+
+            if (tg.BackButton) {
+                tg.BackButton.onClick(function() {
+                    var activeTab = document.querySelector('.tab-content.active');
+                    if (activeTab && activeTab.id !== 'tab-home') {
+                        switchTab('home', document.getElementById('nav-home'));
+                    } else {
+                        tg.close();
+                    }
+                });
+            }
         }
 
-        // --- НАВИГАЦИЯ ---
+        // --- 2. НАВИГАЦИЯ ---
         function switchTab(tabName, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
@@ -529,52 +683,181 @@
             var activeTab = document.getElementById('tab-' + tabName);
             if (activeTab) activeTab.classList.add('active');
             
-            if (element) element.classList.add('active');
-            if (tabName === 'orders') renderOrders();
+            if (element) {
+                element.classList.add('active');
+            } else {
+                var navItems = document.querySelectorAll('.nav-item');
+                var index = ['home', 'catalog', 'cart', 'orders'].indexOf(tabName);
+                if (index !== -1 && navItems[index]) {
+                    navItems[index].classList.add('active');
+                }
+            }
+
+            if (tabName === 'home') hideInfo();
+            if (tabName === 'catalog') closePrice();
+            if (tabName === 'orders') renderOrders(); // Рендерим заказы при переходе
+
+            if (tg && tg.BackButton) {
+                if (tabName === 'home') {
+                    tg.BackButton.hide();
+                } else {
+                    tg.BackButton.show();
+                }
+            }
         }
 
-        // --- КОРЗИНА ---
+        // --- 3. КАТАЛОГ ---
+        function showPrice(type) {
+            var start = document.getElementById('catalog-start');
+            if (start) start.classList.add('hidden');
+            var price = document.getElementById('price-' + type);
+            if (price) price.classList.add('active');
+        }
+
+        function closePrice() {
+            document.querySelectorAll('.price-view').forEach(el => el.classList.remove('active'));
+            var start = document.getElementById('catalog-start');
+            if (start) start.classList.remove('hidden');
+        }
+
+        function toggleFaq(element) {
+            var parent = element.parentElement;
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (item !== parent) item.classList.remove('active');
+            });
+            parent.classList.toggle('active');
+        }
+
+        // --- 4. ПОЛНОЭКРАННАЯ КАРТА ---
+        var selectedMap = null;
+
+        function openFullScreenMap() {
+            document.getElementById('fullscreenMap').classList.add('active');
+            if (tg) tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function closeFullScreenMap() {
+            document.getElementById('fullscreenMap').classList.remove('active');
+        }
+
+        function openMapPoint(name, type, price) {
+            selectedMap = { name: name, type: type, price: price };
+            document.getElementById('mapModalTitle').innerText = name + ': ' + type;
+            document.getElementById('mapModalPrice').innerText = price + ' ₽';
+            document.getElementById('mapModal').classList.add('active');
+            if (tg) tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function closeMapModal() {
+            document.getElementById('mapModal').classList.remove('active');
+            selectedMap = null;
+        }
+
+        function confirmMapPoint() {
+            if (selectedMap) {
+                addToCart('Сопровождение (' + selectedMap.name + ')', '1 игра');
+            }
+            closeMapModal();
+            closeFullScreenMap();
+        }
+
+        // --- 5. КОРЗИНА И LOCALSTORAGE ---
         var cart = [];
         var pendingItem = null;
 
         function loadCart() {
             try {
                 var saved = localStorage.getItem('oneboost_cart');
-                if (saved) { cart = JSON.parse(saved); updateCartUI(); }
-            } catch (e) {}
+                if (saved) {
+                    cart = JSON.parse(saved);
+                    updateCartUI();
+                }
+            } catch (e) { console.log('Ошибка загрузки корзины', e); }
         }
 
         function saveCart() {
-            try { localStorage.setItem('oneboost_cart', JSON.stringify(cart)); } catch (e) {}
+            try {
+                localStorage.setItem('oneboost_cart', JSON.stringify(cart));
+            } catch (e) { console.log('Ошибка сохранения', e); }
         }
 
-        function addToCart(service, amount, price) {
-            if (cart.length >= 5) return alert('Максимум 5 позиций');
-            pendingItem = { service: service, amount: amount, price: price || 0 };
-            document.getElementById('confirmAddTitle').innerText = 'Добавить ' + service + ' (' + amount + ')?';
-            document.getElementById('confirmAddModal').classList.add('active');
+        function showToast(text) {
+            var toast = document.getElementById('toast');
+            var toastText = document.getElementById('toastText');
+            if (toast && toastText) {
+                toastText.innerText = text;
+                toast.classList.add('show');
+                setTimeout(function() {
+                    toast.classList.remove('show');
+                }, 2500);
+            }
         }
 
-        function cancelAdd() { document.getElementById('confirmAddModal').classList.remove('active'); pendingItem = null; }
+        function addToCart(service, amount) {
+            if (cart.length >= 5) {
+                showToast('Максимум 5 позиций в корзине');
+                return;
+            }
+            
+            pendingItem = { service: service, amount: amount };
+            var title = document.getElementById('confirmAddTitle');
+            if (title) title.innerText = 'Добавить ' + service + ' (' + amount + ') в корзину?';
+            var modal = document.getElementById('confirmAddModal');
+            if (modal) modal.classList.add('active');
+        }
+
+        function cancelAdd() {
+            var modal = document.getElementById('confirmAddModal');
+            if (modal) modal.classList.remove('active');
+            pendingItem = null;
+        }
+
         function confirmAdd() {
-            if (pendingItem) { cart.push(pendingItem); updateCartUI(); saveCart(); if (tg) tg.HapticFeedback.notificationOccurred('success'); }
+            if (pendingItem) {
+                cart.push(pendingItem);
+                updateCartUI();
+                saveCart();
+                showToast('Добавлено: ' + pendingItem.service);
+                if (tg) tg.HapticFeedback.notificationOccurred('success');
+            }
             cancelAdd();
         }
 
         function openModal(type) {
-            pendingItem = { service: type, amount: null, price: 0 }; 
-            document.getElementById('customModal').classList.add('active');
-            setTimeout(function() { document.getElementById('customAmountInput').focus(); }, 100);
+            pendingItem = { service: type, amount: null }; 
+            var title = document.getElementById('modalTitle');
+            if (title) title.innerText = type === 'Буст' ? 'Количество миллионов для Буста' : 'Количество миллионов для Сопровождения';
+            var modal = document.getElementById('customModal');
+            if (modal) modal.classList.add('active');
+            setTimeout(function() {
+                var input = document.getElementById('customAmountInput');
+                if (input) input.focus();
+            }, 100);
         }
 
-        function closeModal() { document.getElementById('customModal').classList.remove('active'); document.getElementById('customAmountInput').value = ''; pendingItem = null; }
-        
+        function closeModal() {
+            var modal = document.getElementById('customModal');
+            if (modal) modal.classList.remove('active');
+            var input = document.getElementById('customAmountInput');
+            if (input) input.value = '';
+            pendingItem = null;
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target.id === 'customModal') closeModal();
+        }
+
         function submitCustomOrder() {
-            var amount = document.getElementById('customAmountInput').value;
-            if (!amount || amount <= 0) return alert('Введите число!');
+            var input = document.getElementById('customAmountInput');
+            var amount = input ? input.value : null;
+            
+            if (!amount || amount <= 0) {
+                alert('Пожалуйста, введите корректное число!');
+                return;
+            }
             var serviceType = pendingItem.service;
             closeModal();
-            addToCart(serviceType, amount + ' млн', 0);
+            addToCart(serviceType, amount + ' млн');
         }
 
         function updateCartUI() {
@@ -593,70 +876,120 @@
             } else {
                 if (emptyState) emptyState.style.display = 'none';
                 if (checkoutBtn) checkoutBtn.style.display = 'block';
-                if (badge) { badge.style.display = 'flex'; badge.innerText = cart.length; }
+                if (badge) {
+                    badge.style.display = 'flex';
+                    badge.innerText = cart.length;
+                }
 
                 cart.forEach(function(item, index) {
                     var div = document.createElement('div');
                     div.className = 'cart-item';
-                    div.innerHTML = '<div class="cart-item-info"><h4>' + item.service + '</h4><p>' + item.amount + '</p></div><button class="btn-delete-item" onclick="removeFromCart(' + index + ')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>';
+                    div.innerHTML = '<div class="cart-item-info"><h4>' + item.service + '</h4><p>' + item.amount + '</p></div><button class="btn-delete-item" onclick="removeFromCart(' + index + ')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>';
                     container.appendChild(div);
                 });
             }
         }
 
-        function removeFromCart(index) { cart.splice(index, 1); updateCartUI(); saveCart(); }
-
-        // --- ОФОРМЛЕНИЕ ---
-        function openCheckoutConfirm() {
-            if (cart.length === 0) return;
-            document.getElementById('checkoutConfirmTitle').innerText = 'Оформить ' + cart.length + ' поз.?';
-            document.getElementById('checkoutConfirmModal').classList.add('active');
-            var btn = document.querySelector('#checkoutConfirmModal .btn-confirm');
-            btn.innerText = 'Да'; btn.onclick = confirmCheckout;
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+            saveCart();
         }
 
-        function closeCheckoutConfirm() { document.getElementById('checkoutConfirmModal').classList.remove('active'); }
+        // --- 6. ОФОРМЛЕНИЕ ---
+        function openCheckoutConfirm() {
+            if (cart.length === 0) return;
+            
+            var title = document.getElementById('checkoutConfirmTitle');
+            if (title) title.innerText = 'Вы уверены, что хотите оформить заказ на ' + cart.length + ' позиций?';
+            
+            var modal = document.getElementById('checkoutConfirmModal');
+            if (modal) modal.classList.add('active');
+            
+            // ВОЗВРАЩАЕМ КНОПКУ К ИСХОДНОМУ СОСТОЯНИЮ
+            var btn = document.querySelector('#checkoutConfirmModal .btn-confirm');
+            btn.innerText = 'Да, оформить';
+            btn.onclick = confirmCheckout;
+        }
+
+        function closeCheckoutConfirm() {
+            var modal = document.getElementById('checkoutConfirmModal');
+            if (modal) modal.classList.remove('active');
+        }
 
         function confirmCheckout() {
             closeCheckoutConfirm();
+            
             var userData = tg.initDataUnsafe.user;
             var userId = userData ? userData.id : null;
             var firstName = userData ? userData.first_name : "Неизвестно";
             var username = userData && userData.username ? "@" + userData.username : "Нет ника";
             
-            if (!userId) return alert("Ошибка: нет доступа к профилю.");
+            if (!userId) {
+                alert("Ошибка: не удалось определить пользователя.");
+                return;
+            }
             
             var profileLink = '<a href="tg://user?id=' + userId + '">' + firstName + '</a>';
+            
             var orderListText = "";
-            cart.forEach(function(item, index) { orderListText += (index + 1) + ". " + item.service + " — " + item.amount + "\n"; });
+            cart.forEach(function(item, index) {
+                orderListText += (index + 1) + ". " + item.service + " — " + item.amount + "\n";
+            });
             
-            var orderText = "⚠️ <b>Новый заказ!</b> (из Mini App)\n\n👤 Клиент: " + profileLink + " (" + username + ")\n🆔 ID: <code>" + userId + "</code>\n\n📦 <b>Заказ:</b>\n" + orderListText;
+            var orderText = "⚠️ <b>Новый заказ!</b> (из Mini App)\n\n";
+            orderText += "👤 Клиент: " + profileLink + " (" + username + ")\n";
+            orderText += "🆔 ID: <code>" + userId + "</code>\n\n";
+            orderText += "📦 <b>Состав заказа:</b>\n" + orderListText;
             
-            var BOT_TOKEN = "8955036904:AAEpJcHRPoAV9QxAVMMJGiGGnzjmvZepT20"; 
+            var BOT_TOKEN = "8955036904:AAEpJcHRPoAV9QxAVMMJGiGGnzjmvZepT20";
             var GROUP_ID = "-1004358524484";
             
             fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
-                method: "POST", headers: { "Content-Type": "application/json" },
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ chat_id: GROUP_ID, text: orderText, parse_mode: "HTML" })
             })
-            .then(res => res.json())
+            .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.ok) {
                     var groupMsgId = data.result.message_id;
+                    
+                    // СОХРАНЯЕМ В ПАМЯТЬ ТЕЛЕФОНА
                     var savedOrders = JSON.parse(localStorage.getItem('my_orders_list') || '[]');
-                    savedOrders.push({ id: groupMsgId, number: savedOrders.length + 1, items: cart.map(function(i) { return i.service + " (" + i.amount + ")"; }).join(", "), status: "active" });
+                    var newOrderObj = {
+                        id: groupMsgId,
+                        number: savedOrders.length + 1,
+                        items: cart.map(function(i) { return i.service + " (" + i.amount + ")"; }).join(", "),
+                        status: "active"
+                    };
+                    savedOrders.push(newOrderObj);
                     localStorage.setItem('my_orders_list', JSON.stringify(savedOrders));
                     
-                    document.getElementById('successModal').classList.add('active');
-                    cart = []; updateCartUI(); saveCart();
+                    var modal = document.getElementById('successModal');
+                    if (modal) modal.classList.add('active');
+                    
+                    cart = [];
+                    updateCartUI();
+                    saveCart();
+                    
                     if (tg) tg.HapticFeedback.notificationOccurred('success');
-                } else { alert("Ошибка Telegram: " + data.description); }
-            }).catch(function() { alert("Ошибка сети."); });
+                } else {
+                    alert("Ошибка при отправке заказа. Попробуйте позже.");
+                }
+            })
+            .catch(function(error) {
+                alert("Ошибка сети. Попробуйте позже.");
+            });
         }
 
-        function closeSuccessModal() { document.getElementById('successModal').classList.remove('active'); switchTab('home', document.getElementById('nav-home')); }
+        function closeSuccessModal() {
+            var modal = document.getElementById('successModal');
+            if (modal) modal.classList.remove('active');
+            switchTab('home', document.getElementById('nav-home')); 
+        }
 
-        // --- ЗАКАЗЫ ---
+        // --- ЛОГИКА ЗАКАЗОВ ТОЛЬКО В MINI APP ---
         function renderOrders() {
             var container = document.getElementById('orders-list-container');
             var emptyState = document.getElementById('orders-empty');
@@ -669,25 +1002,27 @@
                 if (emptyState) emptyState.style.display = 'flex';
             } else {
                 if (emptyState) emptyState.style.display = 'none';
+                
                 savedOrders.forEach(function(order) {
                     var div = document.createElement('div');
                     div.className = 'cart-item';
                     div.style.flexDirection = 'column';
                     div.style.alignItems = 'flex-start';
+                    div.style.gap = '10px';
                     
                     var statusText = order.status === 'active' ? 'В обработке' : 'Выполнен';
                     var statusColor = order.status === 'active' ? 'var(--neon-light)' : '#00ff64';
                     
                     div.innerHTML = `
-                        <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
-                            <h4 style="color:#fff; font-size: 15px; font-family: 'Unbounded', sans-serif;">Заказ #${order.number}</h4>
-                            <span style="color: ${statusColor}; font-size:11px; font-weight:700;">${statusText}</span>
+                        <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                            <h4 style="color:#fff; font-family: 'Unbounded', sans-serif;">Заказ #${order.number}</h4>
+                            <span style="color: ${statusColor}; font-size:12px; font-weight: 700;">${statusText}</span>
                         </div>
-                        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 10px;">${order.items}</p>
+                        <p style="color: var(--text-muted); font-size:13px;">${order.items}</p>
                         ${order.status === 'active' ? `
-                        <div style="display:flex; gap:10px; width:100%;">
-                            <button onclick="openCompleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(0, 255, 100, 0.1); border:1px solid rgba(0, 255, 100, 0.3); color:#00ff64; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700; font-size: 12px;">ЗАВЕРШИТЬ</button>
-                            <button onclick="openDeleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(255, 0, 85, 0.1); border:1px solid rgba(255, 0, 85, 0.3); color:#ff0055; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700; font-size: 12px;">УДАЛИТЬ</button>
+                        <div style="display:flex; gap:10px; width:100%; margin-top:5px;">
+                            <button onclick="openCompleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(0, 255, 100, 0.1); border:1px solid rgba(0, 255, 100, 0.3); color:#00ff64; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700; font-size: 12px; font-family: 'Unbounded', sans-serif;">ЗАВЕРШИТЬ</button>
+                            <button onclick="openDeleteModal(${order.id}, ${order.number})" style="flex:1; background: rgba(255, 0, 85, 0.1); border:1px solid rgba(255, 0, 85, 0.3); color:#ff0055; padding:10px; border-radius:10px; cursor:pointer; font-weight: 700; font-size: 12px; font-family: 'Unbounded', sans-serif;">УДАЛИТЬ</button>
                         </div>
                         ` : ''}
                     `;
@@ -700,28 +1035,34 @@
 
         function openCompleteModal(id, num) {
             currentAction = { type: 'complete', id: id, num: num };
-            document.getElementById('checkoutConfirmTitle').innerText = 'Выполнить #' + num + '?';
+            document.getElementById('checkoutConfirmTitle').innerText = 'Подтвердить выполнение заказа #' + num + '?';
             document.getElementById('checkoutConfirmModal').classList.add('active');
+            
             var btn = document.querySelector('#checkoutConfirmModal .btn-confirm');
-            btn.innerText = 'Да'; btn.onclick = executeAction;
+            btn.innerText = 'Да, завершить';
+            btn.onclick = executeAction;
         }
 
         function openDeleteModal(id, num) {
             currentAction = { type: 'delete', id: id, num: num };
-            document.getElementById('checkoutConfirmTitle').innerText = 'Удалить #' + num + '?';
+            document.getElementById('checkoutConfirmTitle').innerText = 'Удалить заказ #' + num + '?';
             document.getElementById('checkoutConfirmModal').classList.add('active');
+            
             var btn = document.querySelector('#checkoutConfirmModal .btn-confirm');
-            btn.innerText = 'Да'; btn.onclick = executeAction;
+            btn.innerText = 'Да, удалить';
+            btn.onclick = executeAction;
         }
 
         function executeAction() {
             if (!currentAction) return;
+            
             var BOT_TOKEN = "8955036904:AAEpJcHRPoAV9QxAVMMJGiGGnzjmvZepT20";
             var GROUP_ID = "-1004358524484";
             var url = "https://api.telegram.org/bot" + BOT_TOKEN;
             var savedOrders = JSON.parse(localStorage.getItem('my_orders_list') || '[]');
             
-            function removeAndRender() {
+            // Общая функция для удаления из памяти и обновления экрана
+            function removeFromMemoryAndRender() {
                 savedOrders = savedOrders.filter(function(o) { return o.id !== currentAction.id; });
                 localStorage.setItem('my_orders_list', JSON.stringify(savedOrders));
                 renderOrders();
@@ -730,24 +1071,86 @@
             }
 
             if (currentAction.type === 'complete') {
+                // Меняем сообщение в группе на "Выполнен" (с проверкой ошибки)
                 fetch(url + "/editMessageText", {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ chat_id: GROUP_ID, message_id: parseInt(currentAction.id), text: `✅ <b>Заказ #${currentAction.num} выполнен!</b>`, parse_mode: "HTML" })
-                }).then(res => res.json()).then(data => {
-                    if (!data.ok) alert("Telegram: " + data.description);
-                    removeAndRender();
-                }).catch(() => removeAndRender());
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: GROUP_ID,
+                        message_id: parseInt(currentAction.id),
+                        text: `✅ <b>Заказ #${currentAction.num} выполнен!</b>`,
+                        parse_mode: "HTML"
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) {
+                        alert("Ошибка Telegram (Завершение): " + data.description);
+                    }
+                    // В ЛЮБОМ СЛУЧАЕ удаляем из приложения
+                    removeFromMemoryAndRender();
+                })
+                .catch(err => {
+                    alert("Ошибка сети: " + err);
+                    removeFromMemoryAndRender();
+                });
+                
             } else if (currentAction.type === 'delete') {
+                // Удаляем сообщение из группы (с проверкой ошибки)
                 fetch(url + "/deleteMessage", {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ chat_id: GROUP_ID, message_id: parseInt(currentAction.id) })
-                }).then(res => res.json()).then(data => {
-                    if (!data.ok) alert("Telegram: " + data.description);
-                    removeAndRender();
-                }).catch(() => removeAndRender());
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: GROUP_ID,
+                        message_id: parseInt(currentAction.id)
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) {
+                        alert("Ошибка Telegram (Удаление): " + data.description);
+                    }
+                    // В ЛЮБОМ СЛУЧАЕ удаляем из приложения
+                    removeFromMemoryAndRender();
+                })
+                .catch(err => {
+                    alert("Ошибка сети: " + err);
+                    removeFromMemoryAndRender();
+                });
             }
         }
 
+        // --- ЛОГИКА СЛАЙДЕРА ---
+        var slider = document.getElementById('slider');
+        var dots = document.querySelectorAll('.dot');
+
+        if (slider) {
+            slider.addEventListener('scroll', function() {
+                var width = slider.offsetWidth;
+                var scrollLeft = slider.scrollLeft;
+                var index = Math.round(scrollLeft / width);
+                
+                dots.forEach(function(dot, i) {
+                    if (i === index) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        function goToSlide(index) {
+            if (slider) {
+                var width = slider.offsetWidth;
+                slider.scrollTo({
+                    left: width * index,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // --- 7. ЗАПУСК ---
         loadCart();
     </script>
 </body>
