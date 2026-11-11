@@ -115,7 +115,7 @@
             overflow: hidden; backdrop-filter: blur(10px);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .slide-card:active { transform: scale(0.98); } /* Анимация нажатия на карточку */
+        .slide-card:active { transform: scale(0.98); }
         .slide-watermark { position: absolute; top: -10px; right: -10px; width: 100px; height: 100px; stroke: rgba(123, 70, 255, 0.12); stroke-width: 1; fill: none; z-index: 0; pointer-events: none; transform: rotate(15deg); }
 
         .badge-hit { position: absolute; top: 15px; right: 15px; background: linear-gradient(90deg, #ff0055, #d1004b); color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 0, 85, 0.4); text-transform: uppercase; letter-spacing: 1px; z-index: 2; }
@@ -123,7 +123,7 @@
         .slide-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 5px; }
         .slide-desc { font-size: 13px; font-weight: 400; color: var(--text-muted); line-height: 1.4; }
         .slide-footer { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; }
-        .slide-price { font-size: 22px; font-weight: 800; color: var(--neon-light); text-shadow: 0 0 10px rgba(123, 70, 255, 0.3); transition: opacity 0.3s ease, transform 0.3s ease; }
+        .slide-price { font-size: 22px; font-weight: 800; color: var(--neon-light); text-shadow: 0 0 10px rgba(123, 70, 255, 0.3); transition: opacity 0.3s ease; }
         .slide-btn { 
             background: rgba(123, 70, 255, 0.15); border: 1px solid var(--glass-border); color: #fff; 
             padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;
@@ -132,7 +132,6 @@
         .slide-btn:hover { background: rgba(123, 70, 255, 0.3); box-shadow: 0 0 15px rgba(123, 70, 255, 0.3); }
         .slide-btn:active { transform: scale(0.9); }
 
-        /* Анимация для точек пагинации */
         .pagination { display: flex; justify-content: center; gap: 6px; margin-bottom: 25px; margin-top: 15px; }
         .dot { 
             width: 18px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; 
@@ -202,7 +201,6 @@
             display: flex; background: rgba(15, 5, 30, 0.8); border: 1px solid var(--glass-border);
             border-radius: 14px; padding: 4px; margin-bottom: 20px; position: relative;
         }
-        /* Ползунок для переключателя (создаем плавный эффект) */
         .currency-switcher::before {
             content: ''; position: absolute; top: 4px; left: 4px; width: calc(33.33% - 2.6px); height: calc(100% - 8px);
             background: var(--gradient-primary); border-radius: 10px; box-shadow: 0 0 15px rgba(123, 70, 255, 0.3);
@@ -219,12 +217,9 @@
         }
         .currency-btn.active { color: #fff; }
 
-        /* Анимация для смены цен */
-        .price-changing { animation: pricePop 0.3s ease forwards; }
-        @keyframes pricePop {
-            0% { opacity: 0; transform: scale(0.9); }
-            100% { opacity: 1; transform: scale(1); }
-        }
+        /* ПЛАВНОЕ МИГАНИЕ ПРИ СМЕНЕ ВАЛЮТЫ */
+        .price-fade { opacity: 0.3; }
+        .price-val { transition: opacity 0.2s ease; }
 
         .btn-custom-amount {
             display: flex; justify-content: center; align-items: center; gap: 10px;
@@ -272,8 +267,8 @@
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); 
-            display: none; justify-content: center; align-items: flex-end; /* Прижимаем к низу */
-            z-index: 600; padding-bottom: 20px;
+            display: none; justify-content: center; align-items: center; /* Центрируем по умолчанию */
+            z-index: 600; 
             transition: align-items 0.3s ease;
         }
         .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
@@ -284,13 +279,13 @@
             padding: 25px; width: 90%; max-width: 340px; text-align: center; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(123, 70, 255, 0.1); 
             position: relative;
+            transform: translateY(-20vh); /* Поднимаем окно выше центра */
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
-        /* ХАК ДЛЯ КЛАВИАТУРЫ: Когда фокус на поле ввода, поднимаем окно наверх */
-        .modal-overlay:focus-within {
-            align-items: flex-start; /* Поднимаем окно вверх */
-            padding-top: 50px; /* Отступ сверху */
+        /* Когда клавиатура открыта (фокус на поле), поднимаем окно еще выше */
+        .modal-overlay:focus-within .modal-content {
+            transform: translateY(-30vh);
         }
         
         .modal-icon { width: 50px; height: 50px; stroke: var(--neon-light); stroke-width: 1.5; fill: none; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(123, 70, 255, 0.5)); }
@@ -758,28 +753,32 @@
             }
         }
 
-        // --- 2. ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ С АНИМАЦИЕЙ ---
+        // --- 2. ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ (С ПЛАВНЫМ МИГАНИЕМ) ---
         function changeCurrency(currency, btn, switcherId) {
             // Меняем активную кнопку
             document.querySelectorAll('#' + switcherId + ' .currency-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            // Двигаем ползунок (через data-атрибут)
+            // Двигаем ползунок
             document.getElementById(switcherId).setAttribute('data-active', currency);
             
-            // Анимируем смену цен
-            document.querySelectorAll('.price-view.active .price-val').forEach(function(el) {
-                // Добавляем класс для анимации исчезновения/появления
-                el.classList.remove('price-changing');
-                void el.offsetWidth; // Триггер рефлоу для перезапуска анимации
-                el.classList.add('price-changing');
+            // Находим все цены в текущем активном окне
+            var activeView = document.querySelector('.price-view.active');
+            if (!activeView) return;
+
+            activeView.querySelectorAll('.price-val').forEach(function(el) {
+                // Добавляем плавное затухание
+                el.classList.add('price-fade');
                 
-                // Меняем текст
+                // Ждем немного и меняем текст
                 setTimeout(() => {
                     if (currency === 'rub') el.innerText = el.getAttribute('data-rub');
                     if (currency === 'uah') el.innerText = el.getAttribute('data-uah');
                     if (currency === 'usd') el.innerText = el.getAttribute('data-usd');
-                }, 150); // Задержка, чтобы текст поменялся в середине анимации
+                    
+                    // Убираем затухание (появление)
+                    el.classList.remove('price-fade');
+                }, 200); 
             });
         }
 
