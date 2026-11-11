@@ -3,294 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OneBoost | Arena Breakout</title>
+    <title>OneBoost</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;700;800&display=swap');
 
         :root {
-            --bg-main: #06030a;
-            --bg-card: #140b24;
-            --bg-card-light: #23133f;
-            --neon: #8a2be2;
-            --neon-light: #b485ff;
-            --text: #ffffff;
+            --bg-dark: #06030a;
+            --bg-card: rgba(20, 11, 36, 0.7);
+            --bg-card-hover: rgba(35, 19, 63, 0.9);
+            --neon-purple: #8a2be2;
+            --neon-light: #c7a4ff;
+            --text-main: #ffffff;
             --text-muted: #8c7c9e;
-            --border: rgba(138, 43, 226, 0.2);
-            --glow: 0 0 20px rgba(138, 43, 226, 0.4);
+            --glass-border: rgba(138, 43, 226, 0.25);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body {
-            background-color: var(--bg-main);
-            /* Фон с объемными фиолетовыми пятнами как на фото */
+            background-color: var(--bg-dark);
+            /* Градиентный фон как на фото */
             background-image: 
                 radial-gradient(circle at 10% 10%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
                 radial-gradient(circle at 90% 90%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(20, 11, 36, 1) 0%, var(--bg-main) 100%);
+                linear-gradient(180deg, #06030a 0%, #0d0618 100%);
             background-attachment: fixed;
-            color: var(--text);
+            color: var(--text-main);
             min-height: 100vh;
             padding: 20px;
             padding-bottom: 110px;
             overflow-x: hidden;
         }
 
-        /* Типографика как на фото */
-        h1, h2, h3, .font-title { font-family: 'Unbounded', sans-serif; letter-spacing: -0.5px; }
-        .text-gradient { background: linear-gradient(90deg, #fff, var(--neon-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .font-title { font-family: 'Unbounded', sans-serif; }
+
+        .svg-icon { width: 24px; height: 24px; stroke: var(--neon-light); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
 
         /* --- ШАПКА --- */
-        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
-        .logo-wrap { display: flex; flex-direction: column; gap: 5px; }
-        .logo { display: flex; align-items: center; gap: 8px; font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 800; }
-        .logo svg { width: 24px; height: 24px; stroke: var(--neon-light); fill: none; }
-        .logo-sub { font-size: 9px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; font-weight: 600; margin-left: 32px; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 10px 5px; }
+        .logo { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; letter-spacing: 1px; font-family: 'Unbounded', sans-serif; text-transform: uppercase; cursor: pointer;}
+        .logo svg { width: 24px; height: 24px; stroke: var(--neon-light); }
         
-        .support-btn { 
+        .support-btn-top { 
             display: flex; align-items: center; gap: 8px;
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-            padding: 8px 14px; border-radius: 12px; text-decoration: none; color: #fff;
-            font-size: 11px; font-weight: 600; transition: 0.2s;
+            background: rgba(138, 43, 226, 0.1); border: 1px solid var(--glass-border); 
+            padding: 8px 14px; border-radius: 20px; text-decoration: none; color: var(--text-main);
+            font-size: 11px; font-weight: 600; transition: all 0.3s;
         }
-        .support-btn svg { width: 16px; height: 16px; stroke: var(--neon-light); fill: none; }
-        .support-btn:active { transform: scale(0.95); }
+        .support-btn-top svg { width: 14px; height: 14px; stroke: var(--neon-light); }
 
-        /* --- БАННЕР / ЗАГОЛОВОК --- */
-        .hero { position: relative; margin-bottom: 25px; padding: 10px 0; }
-        .hero-tag { font-size: 12px; letter-spacing: 4px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
-        .hero-title { font-size: 38px; font-weight: 800; line-height: 1; margin-bottom: 5px; text-transform: uppercase; }
-        .hero-sub { font-size: 11px; letter-spacing: 3px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
+        /* --- ПРИВЕТСТВЕННАЯ КАРТОЧКА --- */
+        .welcome-card {
+            background: linear-gradient(135deg, rgba(30, 15, 55, 0.8) 0%, rgba(10, 5, 20, 0.9) 100%);
+            border: 1px solid var(--glass-border); border-radius: 24px; 
+            padding: 25px 20px; margin-bottom: 25px;
+            position: relative; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .welcome-card::before { 
+            content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; 
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.3) 0%, transparent 70%); 
+            border-radius: 50%; pointer-events: none;
+        }
+        
+        .welcome-title { font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; font-family: 'Unbounded', sans-serif;}
+        .welcome-title span { color: var(--neon-light); text-shadow: 0 0 15px rgba(138, 43, 226, 0.5); }
+        .welcome-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+        
+        .btn-primary {
+            background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%);
+            color: #fff; border: none; padding: 15px; border-radius: 16px;
+            font-size: 14px; font-weight: 700; width: 100%; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4); transition: transform 0.2s;
+            font-family: 'Unbounded', sans-serif;
+        }
+        .btn-primary:active { transform: scale(0.97); }
 
-        /* --- ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ (КАК НА ФОТО) --- */
+        /* --- СЛАЙДЕР --- */
+        .section-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; font-family: 'Unbounded', sans-serif; letter-spacing: 0.5px;}
+        
+        .slider-wrapper { width: 100%; overflow: hidden; margin-bottom: 25px; border-radius: 20px; }
+        .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 15px; padding-bottom: 5px; }
+        .slider-container::-webkit-scrollbar { display: none; }
+        
+        .slide-card {
+            min-width: 100%; background: var(--bg-card); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 20px; scroll-snap-align: center;
+            display: flex; flex-direction: column; justify-content: space-between;
+            backdrop-filter: blur(10px);
+        }
+        .slide-title { font-size: 18px; font-weight: 800; margin-bottom: 5px; font-family: 'Unbounded', sans-serif;}
+        .slide-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 15px; }
+        .slide-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+        .slide-price { font-size: 20px; font-weight: 800; color: var(--neon-light); font-family: 'Unbounded', sans-serif;}
+        .btn-buy {
+            background: rgba(138, 43, 226, 0.15); border: 1px solid var(--glass-border); color: #fff;
+            padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination { display: flex; justify-content: center; gap: 6px; margin-bottom: 25px; }
+        .dot { width: 18px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; transition: 0.3s; }
+        .dot.active { background: var(--neon-purple); width: 28px; box-shadow: 0 0 10px var(--neon-purple); }
+
+        /* --- ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ (В КАТАЛОГЕ) --- */
         .currency-switcher {
-            display: flex; background: rgba(20, 11, 36, 0.8); border: 1px solid var(--border);
-            border-radius: 16px; padding: 5px; margin-bottom: 20px; position: relative; z-index: 10;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+            display: flex; background: rgba(20, 11, 36, 0.8); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 4px; margin-bottom: 20px;
         }
         .currency-btn {
-            flex: 1; padding: 12px; border-radius: 12px; border: none; background: transparent;
-            color: var(--text-muted); font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.3s;
+            flex: 1; padding: 10px; border-radius: 12px; border: none; background: transparent;
+            color: var(--text-muted); font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.3s;
             font-family: 'Unbounded', sans-serif;
         }
         .currency-btn.active {
-            background: linear-gradient(180deg, var(--bg-card-light) 0%, var(--bg-card) 100%);
+            background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
             color: #fff; box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
             border: 1px solid rgba(138, 43, 226, 0.3);
         }
 
-        /* --- СЕТКА ЦЕН (ДВЕ КОЛОНКИ КАК НА ФОТО) --- */
-        .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
-        
-        .price-pill {
-            /* Объемная капсула */
-            background: linear-gradient(180deg, rgba(35, 19, 63, 0.8) 0%, rgba(20, 11, 36, 0.9) 100%);
-            border: 1px solid rgba(138, 43, 226, 0.15);
-            border-radius: 20px; padding: 15px 12px;
-            display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 15px rgba(0,0,0,0.3);
-            cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
+        /* --- КАТАЛОГ --- */
+        .price-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
+        .price-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-card); border: 1px solid var(--glass-border);
+            padding: 15px 20px; border-radius: 16px; backdrop-filter: blur(10px);
+            cursor: pointer; transition: all 0.2s;
         }
-        .price-pill::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%); pointer-events: none;
-        }
-        .price-pill:active { transform: scale(0.96); border-color: var(--neon); box-shadow: 0 0 15px rgba(138, 43, 226, 0.3); }
-        
-        .price-val { font-size: 16px; font-weight: 800; font-family: 'Unbounded', sans-serif; color: #fff; z-index: 1; }
-        .price-m { font-size: 14px; font-weight: 700; color: var(--neon-light); display: flex; align-items: center; gap: 5px; z-index: 1; }
-        .price-m svg { width: 14px; height: 14px; stroke: var(--neon-light); fill: none; }
+        .price-item:active { transform: scale(0.98); }
+        .price-left { display: flex; align-items: center; gap: 12px; }
+        .price-coin-icon { width: 32px; height: 32px; background: rgba(138, 43, 226, 0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--neon-light); font-weight: 800; font-size: 12px; font-family: 'Unbounded', sans-serif;}
+        .price-amount { font-size: 16px; font-weight: 800; color: var(--text-main); font-family: 'Unbounded', sans-serif;}
+        .price-millions { font-size: 14px; font-weight: 600; color: var(--text-muted); }
 
-        /* --- ПРЕИМУЩЕСТВА (КАК НА ФОТО) --- */
-        .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        /* --- ПРЕИМУЩЕСТВА --- */
+        .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
         .feature-card {
-            background: linear-gradient(180deg, rgba(20, 11, 36, 0.8) 0%, rgba(10, 5, 20, 0.9) 100%);
-            border: 1px solid rgba(255,255,255,0.05); border-radius: 16px;
-            padding: 15px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;
+            background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px;
+            padding: 15px 10px; text-align: center; backdrop-filter: blur(10px);
         }
-        .feature-icon svg { width: 24px; height: 24px; stroke: var(--neon-light); fill: none; filter: drop-shadow(0 0 5px rgba(138,43,226,0.5)); }
-        .feature-text { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); line-height: 1.3; }
+        .feature-icon { margin-bottom: 8px; }
+        .feature-icon svg { width: 24px; height: 24px; stroke: var(--neon-light); }
+        .feature-text { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
 
-        /* --- КНОПКА ПОДДЕРЖКИ ВНИЗУ --- */
-        .contact-btn {
+        /* --- КНОПКА СВЯЗИ --- */
+        .contact-btn-wide {
             display: flex; align-items: center; gap: 15px;
             background: linear-gradient(90deg, rgba(138, 43, 226, 0.15) 0%, rgba(138, 43, 226, 0.05) 100%);
-            border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 50px; padding: 10px 20px 10px 10px;
-            text-decoration: none; color: #fff; transition: 0.2s;
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.15);
+            border: 1px solid var(--glass-border); border-radius: 50px; padding: 10px 20px 10px 10px;
+            text-decoration: none; color: #fff; transition: all 0.2s; margin-bottom: 20px;
         }
-        .contact-btn:active { transform: scale(0.98); }
-        .contact-icon { width: 40px; height: 40px; background: var(--neon); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px var(--neon); }
-        .contact-icon svg { width: 20px; height: 20px; stroke: #fff; fill: none; margin-left: -2px; }
+        .contact-icon-wrap { width: 40px; height: 40px; background: var(--neon-purple); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5); }
+        .contact-icon-wrap svg { width: 20px; height: 20px; stroke: #fff; margin-left: -2px; }
         .contact-text { flex: 1; }
-        .contact-title { font-size: 9px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
-        .contact-desc { font-size: 14px; font-weight: 800; font-family: 'Unbounded', sans-serif; }
-        .arrow-circle { width: 32px; height: 32px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; }
-        .arrow-circle svg { width: 16px; height: 16px; stroke: #fff; fill: none; }
+        .contact-title { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
+        .contact-desc { font-size: 14px; font-weight: 700; color: #fff; font-family: 'Unbounded', sans-serif;}
 
-        /* --- НИЖНЕЕ МЕНЮ (КАПСУЛА) --- */
+        /* --- НИЖНЕЕ МЕНЮ --- */
         .bottom-nav { 
             position: fixed; bottom: 15px; left: 15px; right: 15px; 
             background: rgba(15, 5, 30, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             display: flex; justify-content: space-around; padding: 10px 8px; border-radius: 30px; 
-            border: 1px solid rgba(138, 43, 226, 0.2); box-shadow: 0 10px 40px rgba(0,0,0,0.9); z-index: 100;
+            border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 100;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6b5b8e; font-size: 9px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 65px; position: relative;}
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6b5b8e; font-size: 9px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 60px; position: relative;}
         .nav-icon-wrap { width: 44px; height: 36px; display: flex; justify-content: center; align-items: center; border-radius: 14px; transition: 0.3s; }
-        .nav-item svg { width: 22px; height: 22px; stroke: #6b5b8e; transition: 0.3s; fill: none; }
+        .nav-item svg { width: 22px; height: 22px; stroke: #6b5b8e; transition: 0.3s; }
         .nav-item.active { color: #fff; }
         .nav-item.active .nav-icon-wrap { background: rgba(138, 43, 226, 0.2); box-shadow: inset 0 0 10px rgba(138, 43, 226, 0.3); }
         .nav-item.active svg { stroke: var(--neon-light); filter: drop-shadow(0 0 5px rgba(138,43,226,0.6)); }
 
         .cart-badge {
-            position: absolute; top: -2px; right: 5px; background: var(--neon); color: white; font-size: 10px; font-weight: 800;
+            position: absolute; top: -2px; right: 5px; background: #ff0055; color: white; font-size: 10px; font-weight: 800;
             min-width: 18px; height: 18px; border-radius: 9px; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 0 10px var(--neon); display: none;
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.6); display: none;
         }
 
-        /* --- ОБЩИЕ ЭЛЕМЕНТЫ ВКЛАДОК --- */
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-top: 10px; }
-        .section-title { font-size: 18px; font-weight: 800; font-family: 'Unbounded', sans-serif; }
+        /* --- МОДАЛЬНЫЕ ОКНА --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 600;
+        }
+        .modal-overlay.active { display: flex; }
         
-        /* Корзина и заказы */
+        .modal-content {
+            background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            padding: 25px; width: 90%; max-width: 340px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
+        }
+        
+        .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #fff; font-family: 'Unbounded', sans-serif;}
+        
+        .modal-input {
+            width: 100%; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--glass-border);
+            color: #fff; padding: 15px; border-radius: 12px; font-size: 18px; text-align: center;
+            margin-bottom: 20px; outline: none; font-weight: 600; font-family: 'Unbounded', sans-serif;
+        }
+        
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; font-family: 'Unbounded', sans-serif;}
+        .btn-cancel { background: rgba(255,255,255,0.1); color: var(--text-muted); }
+        .btn-confirm { background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%); color: #fff; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3); }
+
+        /* --- КОРЗИНА --- */
+        .cart-empty { display: flex; flex-direction: column; align-items: center; padding: 50px 20px; text-align: center; }
+        .cart-empty svg { width: 60px; height: 60px; stroke: var(--text-muted); margin-bottom: 15px; opacity: 0.5; }
+        .cart-empty p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+
         .cart-item {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 16px; padding: 15px; margin-bottom: 10px; 
+            background: var(--bg-card); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 15px; margin-bottom: 10px;
         }
-        .cart-item-info h4 { font-size: 15px; color: #fff; margin-bottom: 4px; font-weight: 700; }
+        .cart-item-info h4 { font-size: 15px; color: #fff; margin-bottom: 4px; font-weight: 700; font-family: 'Unbounded', sans-serif;}
         .cart-item-info p { font-size: 13px; color: var(--neon-light); font-weight: 600; }
         .btn-delete-item {
             background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3);
             color: #ff0055; padding: 8px; border-radius: 10px; cursor: pointer;
         }
-        .btn-delete-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
-        
-        .cart-empty { display: flex; flex-direction: column; align-items: center; padding: 50px 20px; text-align: center; }
-        .cart-empty svg { width: 60px; height: 60px; stroke: var(--text-muted); margin-bottom: 15px; opacity: 0.5; fill: none; }
-        .cart-empty p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+        .btn-delete-item svg { width: 18px; height: 18px; stroke: currentColor; }
 
-        .btn-primary {
+        .btn-checkout {
             background: linear-gradient(180deg, #9d4edd 0%, #5a189a 100%);
             color: #fff; border: none; padding: 16px; border-radius: 16px;
-            font-size: 15px; font-weight: 800; font-family: 'Unbounded', sans-serif;
-            width: 100%; cursor: pointer; box-shadow: 0 4px 20px rgba(157, 78, 221, 0.4);
-            transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px;
+            font-size: 15px; font-weight: 800; width: 100%; cursor: pointer;
+            margin-top: 20px; box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4);
+            font-family: 'Unbounded', sans-serif;
         }
-        .btn-primary:active { transform: scale(0.97); }
 
-        /* Модалки */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 600; }
-        .modal-overlay.active { display: flex; }
-        .modal-content { background: linear-gradient(180deg, var(--bg-card-light) 0%, var(--bg-card) 100%); border: 1px solid var(--border); border-radius: 24px; padding: 25px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 0 50px rgba(138, 43, 226, 0.2); }
-        .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; font-family: 'Unbounded', sans-serif; }
-        .modal-input { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; font-size: 18px; text-align: center; margin-bottom: 20px; font-weight: 700; outline: none; font-family: 'Unbounded', sans-serif;}
-        .modal-actions { display: flex; gap: 10px; }
-        .modal-btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; }
-        .btn-cancel { background: rgba(255,255,255,0.1); color: var(--text-muted); }
-        .btn-confirm { background: var(--neon); color: #fff; box-shadow: 0 0 15px rgba(138,43,226,0.4); }
-
-        /* Успех */
-        .success-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 700; }
+        /* --- КРАСИВОЕ УВЕДОМЛЕНИЕ --- */
+        .success-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 700;
+        }
         .success-overlay.active { display: flex; }
-        .success-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 30px; padding: 30px 20px; width: 90%; max-width: 320px; text-align: center; }
+        
+        .success-box {
+            background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--glass-border); border-radius: 30px;
+            padding: 30px 20px; width: 90%; max-width: 320px; text-align: center;
+        }
+
         .checkmark-container { width: 70px; height: 70px; margin: 0 auto 20px; position: relative; }
-        .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon); fill: none; animation: stroke 0.6s forwards; }
+        .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: var(--neon-purple); fill: none; animation: stroke 0.6s forwards; }
         .checkmark-check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; stroke-width: 4; stroke: var(--neon-light); fill: none; animation: stroke 0.3s 0.6s forwards; }
         @keyframes stroke { 100% { stroke-dashoffset: 0; } }
+
+        .success-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 10px; font-family: 'Unbounded', sans-serif;}
+        .success-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <!-- ШАПКА -->
     <div class="top-bar">
-        <div class="logo-wrap">
-            <div class="logo" onclick="switchTab('home', document.getElementById('nav-home'))">
-                <svg viewBox="0 0 24 24"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"></path></svg>
-                <span>ONEBOOST</span>
-            </div>
-            <div class="logo-sub">Быстро · Безопасно · Надежно</div>
+        <div class="logo" onclick="switchTab('home', document.getElementById('nav-home'))">
+            <svg viewBox="0 0 24 24"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"></path></svg>
+            <span>ONEBOOST</span>
         </div>
-        <a href="https://t.me/Oneboostmanager" target="_blank" class="support-btn">
+        <a href="https://t.me/Oneboostmanager" target="_blank" class="support-btn-top">
             <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-            ПОДДЕРЖКА 24/7
+            24/7
         </a>
     </div>
 
     <!-- ВКЛАДКА: ГЛАВНАЯ -->
     <div id="tab-home" class="tab-content active">
         
-        <div class="hero">
-            <div class="hero-tag">ARENA BREAKOUT</div>
-            <div class="hero-title">ПРАЙС <span class="text-gradient">ЛИСТ</span></div>
-            <div class="hero-sub">Быстрый буст миллионов</div>
+        <div class="welcome-card">
+            <div class="welcome-title">ПРИВЕТСТВУЕМ В <br><span>ONEBOOST!</span></div>
+            <div class="welcome-desc">Твой надежный проводник в мир Arena Breakout. Быстро, безопасно и с гарантией.</div>
+            <button class="btn-primary" onclick="switchTab('catalog', document.getElementById('nav-catalog'))">
+                ПЕРЕЙТИ В КАТАЛОГ
+            </button>
         </div>
 
-        <!-- ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ -->
-        <div class="currency-switcher">
-            <button class="currency-btn active" onclick="changeCurrency('rub', this)">₽ RUB</button>
-            <button class="currency-btn" onclick="changeCurrency('uah', this)">₴ UAH</button>
-            <button class="currency-btn" onclick="changeCurrency('usd', this)">$ USD</button>
-        </div>
-
-        <!-- СЕТКА ЦЕН -->
-        <div class="price-grid">
-            <div class="price-pill" onclick="addToCart('Буст', '5 млн', 1300)">
-                <div class="price-val price-val-node" data-rub="1 300 ₽" data-uah="720 ₴" data-usd="$15">1 300 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 5M</div>
-            </div>
-            <div class="price-pill" onclick="addToCart('Буст', '60 млн', 12500)">
-                <div class="price-val price-val-node" data-rub="12 500 ₽" data-uah="6 910 ₴" data-usd="$152">12 500 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 60M</div>
-            </div>
-            <div class="price-pill" onclick="addToCart('Буст', '10 млн', 2200)">
-                <div class="price-val price-val-node" data-rub="2 200 ₽" data-uah="1 210 ₴" data-usd="$27">2 200 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 10M</div>
-            </div>
-            <div class="price-pill" onclick="addToCart('Буст', '70 млн', 14500)">
-                <div class="price-val price-val-node" data-rub="14 500 ₽" data-uah="8 010 ₴" data-usd="$176">14 500 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 70M</div>
-            </div>
-            <div class="price-pill" onclick="addToCart('Буст', '20 млн', 4400)">
-                <div class="price-val price-val-node" data-rub="4 400 ₽" data-uah="2 430 ₴" data-usd="$53">4 400 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 20M</div>
-            </div>
-            <div class="price-pill" onclick="addToCart('Буст', '80 млн', 16100)">
-                <div class="price-val price-val-node" data-rub="16 100 ₽" data-uah="8 900 ₴" data-usd="$195">16 100 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 80M</div>
-            </div>
-            <div class="price-pill" onclick="addToCart('Буст', '30 млн', 6500)">
-                <div class="price-val price-val-node" data-rub="6 500 ₽" data-uah="3 590 ₴" data-usd="$79">6 500 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 30M</div>
-            </div>
-            <div class="price-pill" onclick="addToCart('Буст', '90 млн', 18100)">
-                <div class="price-val price-val-node" data-rub="18 100 ₽" data-uah="10 000 ₴" data-usd="$220">18 100 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 90M</div>
-            </div>
-            <div class="price-pill" onclick="addToCart('Буст', '40 млн', 8500)">
-                <div class="price-val price-val-node" data-rub="8 500 ₽" data-uah="4 690 ₴" data-usd="$103">8 500 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 40M</div>
-            </div>
-            <div class="price-pill" onclick="addToCart('Буст', '100 млн', 19600)">
-                <div class="price-val price-val-node" data-rub="19 600 ₽" data-uah="10 830 ₴" data-usd="$238">19 600 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 100M</div>
-            </div>
-            <div class="price-pill" onclick="addToCart('Буст', '50 млн', 10600)">
-                <div class="price-val price-val-node" data-rub="10 600 ₽" data-uah="5 860 ₴" data-usd="$129">10 600 ₽</div>
-                <div class="price-m"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12"></path></svg> 50M</div>
+        <div class="section-title">ХИТЫ ПРОДАЖ</div>
+        <div class="slider-wrapper">
+            <div class="slider-container" id="slider">
+                <div class="slide-card">
+                    <div>
+                        <div class="slide-title">Буст 10 млн</div>
+                        <div class="slide-desc">Мгновенный фарм коинов. Наши топ-игроки выполнят заказ в кратчайшие сроки.</div>
+                    </div>
+                    <div class="slide-footer">
+                        <div class="slide-price">2 200 ₽</div>
+                        <button class="btn-buy" onclick="addToCart('Буст', '10 млн', 2200)">Заказать</button>
+                    </div>
+                </div>
+                <div class="slide-card">
+                    <div>
+                        <div class="slide-title">Сопровождение 5 млн</div>
+                        <div class="slide-desc">Играем в одной команде. Приносим вам лучший лут без вашего участия.</div>
+                    </div>
+                    <div class="slide-footer">
+                        <div class="slide-price">1 300 ₽</div>
+                        <button class="btn-buy" onclick="addToCart('Сопровождение', '5 млн', 1300)">Заказать</button>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="pagination" id="pagination">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+        </div>
 
-        <button class="btn-primary" style="margin-bottom: 30px;" onclick="openModal('Буст')">
-            ДРУГОЕ КОЛИЧЕСТВО
-        </button>
-
-        <!-- ПРЕИМУЩЕСТВА -->
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
@@ -310,44 +335,99 @@
             </div>
         </div>
 
-        <!-- КНОПКА СВЯЗИ -->
-        <a href="https://t.me/Oneboostmanager" target="_blank" class="contact-btn">
-            <div class="contact-icon">
+        <a href="https://t.me/Oneboostmanager" target="_blank" class="contact-btn-wide">
+            <div class="contact-icon-wrap">
                 <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </div>
             <div class="contact-text">
                 <div class="contact-title">НАПИШИ В TELEGRAM</div>
                 <div class="contact-desc">ПОЛУЧИ БУСТ СЕЙЧАС</div>
             </div>
-            <div class="arrow-circle">
-                <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </div>
         </a>
+    </div>
+
+    <!-- ВКЛАДКА: КАТАЛОГ (ПРАЙС) -->
+    <div id="tab-catalog" class="tab-content">
+        <div class="section-title" style="text-align: center; margin-bottom: 20px;">ПРАЙС ЛИСТ</div>
+        
+        <!-- ПЕРЕКЛЮЧАТЕЛЬ ВАЛЮТ -->
+        <div class="currency-switcher">
+            <button class="currency-btn active" onclick="changeCurrency('rub', this)">₽ RUB</button>
+            <button class="currency-btn" onclick="changeCurrency('uah', this)">₴ UAH</button>
+            <button class="currency-btn" onclick="changeCurrency('usd', this)">$ USD</button>
+        </div>
+
+        <div class="price-list">
+            <div class="price-item" onclick="addToCart('Буст', '5 млн', 1300)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="1 300 ₽" data-uah="720 ₴" data-usd="$15">1 300 ₽</div></div>
+                <div class="price-millions">5M</div>
+            </div>
+            <div class="price-item" onclick="addToCart('Буст', '10 млн', 2200)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="2 200 ₽" data-uah="1 210 ₴" data-usd="$27">2 200 ₽</div></div>
+                <div class="price-millions">10M</div>
+            </div>
+            <div class="price-item" onclick="addToCart('Буст', '20 млн', 4400)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="4 400 ₽" data-uah="2 430 ₴" data-usd="$53">4 400 ₽</div></div>
+                <div class="price-millions">20M</div>
+            </div>
+            <div class="price-item" onclick="addToCart('Буст', '30 млн', 6500)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="6 500 ₽" data-uah="3 590 ₴" data-usd="$79">6 500 ₽</div></div>
+                <div class="price-millions">30M</div>
+            </div>
+            <div class="price-item" onclick="addToCart('Буст', '40 млн', 8500)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="8 500 ₽" data-uah="4 690 ₴" data-usd="$103">8 500 ₽</div></div>
+                <div class="price-millions">40M</div>
+            </div>
+            <div class="price-item" onclick="addToCart('Буст', '50 млн', 10600)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="10 600 ₽" data-uah="5 860 ₴" data-usd="$129">10 600 ₽</div></div>
+                <div class="price-millions">50M</div>
+            </div>
+            <div class="price-item" onclick="addToCart('Буст', '60 млн', 12500)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="12 500 ₽" data-uah="6 910 ₴" data-usd="$152">12 500 ₽</div></div>
+                <div class="price-millions">60M</div>
+            </div>
+            <div class="price-item" onclick="addToCart('Буст', '70 млн', 14500)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="14 500 ₽" data-uah="8 010 ₴" data-usd="$176">14 500 ₽</div></div>
+                <div class="price-millions">70M</div>
+            </div>
+            <div class="price-item" onclick="addToCart('Буст', '80 млн', 16100)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="16 100 ₽" data-uah="8 900 ₴" data-usd="$195">16 100 ₽</div></div>
+                <div class="price-millions">80M</div>
+            </div>
+            <div class="price-item" onclick="addToCart('Буст', '90 млн', 18100)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="18 100 ₽" data-uah="10 000 ₴" data-usd="$220">18 100 ₽</div></div>
+                <div class="price-millions">90M</div>
+            </div>
+            <div class="price-item" onclick="addToCart('Буст', '100 млн', 19600)">
+                <div class="price-left"><div class="price-coin-icon">M</div><div class="price-amount price-val" data-rub="19 600 ₽" data-uah="10 830 ₴" data-usd="$238">19 600 ₽</div></div>
+                <div class="price-millions">100M</div>
+            </div>
+        </div>
+
+        <button class="btn-primary" style="margin-bottom: 25px;" onclick="openModal('Буст')">
+            ДРУГОЕ КОЛИЧЕСТВО
+        </button>
     </div>
 
     <!-- ВКЛАДКА: КОРЗИНА -->
     <div id="tab-cart" class="tab-content">
-        <div class="section-header">
-            <div class="section-title">КОРЗИНА</div>
-        </div>
+        <div class="section-title" style="text-align: center; margin-bottom: 20px;">КОРЗИНА</div>
         <div id="cart-items-container"></div>
         <div id="cart-empty-state" class="cart-empty">
-            <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             <p>Ваша корзина пуста</p>
         </div>
-        <button id="checkout-btn" class="btn-primary" style="display: none;" onclick="openCheckoutConfirm()">ОФОРМИТЬ ЗАКАЗ</button>
+        <button id="checkout-btn" class="btn-checkout" style="display: none;" onclick="openCheckoutConfirm()">ОФОРМИТЬ ЗАКАЗ</button>
     </div>
 
     <!-- ВКЛАДКА: ЗАКАЗЫ -->
     <div id="tab-orders" class="tab-content">
-        <div class="section-header">
-            <div class="section-title">МОИ ЗАКАЗЫ</div>
-        </div>
+        <div class="section-title" style="text-align: center; margin-bottom: 20px;">МОИ ЗАКАЗЫ</div>
         <div id="orders-list-container"></div>
         <div id="orders-empty" class="cart-empty" style="display: none;">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <svg viewBox="0 0 24 24" fill="none" style="stroke: var(--neon-purple);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
             <p style="color: #fff; font-weight: 700; margin-bottom: 10px;">У вас пока нет заказов</p>
-            <p style="font-size: 13px;">Заказы из бота смотрите в самом боте.</p>
+            <p style="font-size: 13px;">Заказы, сделанные через кнопки в боте, смотрите в самом боте.</p>
         </div>
     </div>
 
@@ -356,6 +436,10 @@
         <div class="nav-item active" id="nav-home" onclick="switchTab('home', this)">
             <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
             <div>Главная</div>
+        </div>
+        <div class="nav-item" id="nav-catalog" onclick="switchTab('catalog', this)">
+            <div class="nav-icon-wrap"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+            <div>Прайс</div>
         </div>
         <div class="nav-item" id="nav-cart" onclick="switchTab('cart', this)">
             <div class="nav-icon-wrap">
@@ -410,8 +494,8 @@
                     <path class="checkmark-check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
                 </svg>
             </div>
-            <div class="modal-title">Заказ оформлен!</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">Менеджер свяжется с вами.</div>
+            <div class="success-title">Заказ оформлен!</div>
+            <div class="success-desc">Менеджер свяжется с вами в ближайшее время для уточнения деталей.</div>
             <button class="btn-primary" onclick="closeSuccessModal()">Закрыть</button>
         </div>
     </div>
@@ -430,7 +514,7 @@
             document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            document.querySelectorAll('.price-val-node').forEach(function(el) {
+            document.querySelectorAll('.price-val').forEach(function(el) {
                 if (currency === 'rub') el.innerText = el.getAttribute('data-rub');
                 if (currency === 'uah') el.innerText = el.getAttribute('data-uah');
                 if (currency === 'usd') el.innerText = el.getAttribute('data-usd');
@@ -540,7 +624,7 @@
             var firstName = userData ? userData.first_name : "Неизвестно";
             var username = userData && userData.username ? "@" + userData.username : "Нет ника";
             
-            if (!userId) return alert("Ошибка: нет доступа к вашему профилю.");
+            if (!userId) return alert("Ошибка: нет доступа к профилю.");
             
             var profileLink = '<a href="tg://user?id=' + userId + '">' + firstName + '</a>';
             var orderListText = "";
